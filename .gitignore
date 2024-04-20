@@ -1,0 +1,45 @@
+# Ignore database files
+*.sqlite3
+*.db
+
+# Ignore static and media files
+static/
+media/
+
+conf/
+
+# Ignore only development files
+backend/core/settings/development*
+
+# Ignore compiled Python files
+*/**/migrations/
+__pycache__/
+*/**/__pycache__/
+*/*/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore environment files
+.env
+
+# Ignore logs and other generated files
+/logs/
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db.sqlite3-journal
+
+# Ignore the virtual environment
+venv/
+
+# Ignore VSCode settings
+.vscode/
+
+# Ignore pycache directories
+__pycache__/
+
+# Ignore pytest cache
+.pytest_cache/
