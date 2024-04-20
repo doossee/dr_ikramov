@@ -117,33 +117,21 @@ class Admin(User, SingletonModel):
 class Doctor(User):
 
     """Doctor user model"""
+
+    licences = models.TextField(verbose_name=_("Licences"), blank=True)
+    experience = models.IntegerField(verbose_name=_("Experience"), null=True, blank=True)
+    experiences = models.TextField(verbose_name=_("Experiences"), blank=True)
+    educations = models.TextField(verbose_name=_("Educations"), blank=True)
+    certificates = models.TextField(verbose_name=_("Certificates"), blank=True)
+
+    content = models.TextField(verbose_name=_("Content"), blank=True)
+    rating = models.DecimalField(verbose_name=_("Rating"), max_digits=3, decimal_places=2)
+
+    tg_acc = models.CharField(verbose_name=_("Telegram"), max_length=150, blank=True)
+    inst_acc = models.CharField(verbose_name=_("Instagram"), max_length=150, blank=True)
+    fb_acc = models.CharField(verbose_name=_("Facebook"), max_length=150, blank=True)
     
-    # Специализации и отзывы
-    # speciality = models.ManyToManyField(verbose_name=_("Specialty"), to="Specialty")
-    # reviews = models.ManyToManyField('Review', verbose_name=_("Reviews"))
-
-    # Лицензии, опыт и образование
-    licences = models.TextField(verbose_name=_("Licences"))
-    experience = models.IntegerField(verbose_name=_("Experience"))
-    experiences = models.TextField(verbose_name=_("Experiences"))
-    educations = models.TextField(verbose_name=_("Educations"))
-    certificates = models.TextField(verbose_name=_("Certificates"))
-
-    # Содержимое и рейтинг
-    content = models.TextField(verbose_name=_("Content"))
-    rating = models.IntegerField(verbose_name=_("Rating"))
-
-    # Контактная информация
-    tg_acc = models.CharField(verbose_name=_("Telegram"), max_length=255)
-    inst_acc = models.CharField(verbose_name=_("Instagram"), max_length=255)
-    fb_acc = models.CharField(verbose_name=_("Facebook"), max_length=255)
-    
-    # Публикация и лаборатория
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
-
-    # Назначения
-    # appointments = models.ManyToManyField('Appointment', verbose_name=_("Appointments"))
-
     
     class Meta:
         db_table = "doctor"
@@ -167,12 +155,12 @@ class Specialty(models.Model):
     
     doctor = models.ForeignKey(verbose_name=_("Doctor"), to="Doctor", on_delete=models.CASCADE)
 
-    name = models.CharField(verbose_name=_("Name"), max_length=255, null=True, blank=True)
-    name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=255)
-    name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=255)
+    name = models.CharField(verbose_name=_("Name"), max_length=150)
+    name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=150)
+    name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=150)
 
-    # Изображение и миниатюра
-    image = models.ImageField(verbose_name=_('Image'), upload_to='brands',)
+    # Image and thumbnail
+    image = models.ImageField(verbose_name=_('Image'), upload_to='specialties',)
     thumbnail = ik_models.ImageSpecField(
         source='image',
         processors=[ik_processors.ResizeToFill(100, 100)],
@@ -180,9 +168,114 @@ class Specialty(models.Model):
         options={'quality': 60}
     )
     
-    # Публикация
     is_published = models.BooleanField(verbose_name=_("Publish"), default=False)
 
-    # Дата создания и обновления
+    # Create and update dates
     created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("Specialty")
+        verbose_name_plural = _("Specialties")
+
+
+class ServiceCategory(models.Model):
+
+    """Service category model"""
+    
+    name = models.CharField(verbose_name=_("Name"), max_length=255, null=True, blank=True)
+    name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=255)
+    name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=255)
+    
+    # Image and thumbnail
+    image = models.ImageField(verbose_name=_('Image'), upload_to='service_categories', null=True, blank=True)
+    thumbnail = ik_models.ImageSpecField(
+        source='image',
+        processors=[ik_processors.ResizeToFill(100, 100)],
+        format='WEBP',
+        options={'quality': 60},
+        null=True,
+        blank=True
+    )
+    
+    is_published = models.BooleanField(verbose_name=_("Publish"), default=False)
+
+    created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("Service Category")
+        verbose_name_plural = _("Service Categories")
+
+
+class Service(models.Model):
+
+    """Service model"""
+       
+    image = models.ImageField(verbose_name=_('Image'), upload_to='services', null=True, blank=True)
+    thumbnail = ik_models.ImageSpecField(
+        source='image',
+        processors=[ik_processors.ResizeToFill(100, 100)],
+        format='WEBP',
+        options={'quality': 60},
+        null=True,
+        blank=True
+    )
+    
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=255, null=True, blank=True)
+    
+    name = models.CharField(verbose_name=_("Name"), max_length=150)
+    name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=150)
+    name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=150)
+
+    category = models.ForeignKey(verbose_name=_("Category"), to=ServiceCategory, on_delete=models.CASCADE)
+
+    description = models.TextField(verbose_name=_("Description"), null=True, blank=True)
+    description_ru = models.TextField(verbose_name=_("Description (Russian)"), null=True, blank=True)
+    description_uz = models.TextField(verbose_name=_("Description (Uzbek)"), null=True, blank=True)
+
+    price = models.IntegerField(verbose_name=_("Price"))
+    
+    content = models.TextField(verbose_name=_("Content"))
+    is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
+
+    created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("Service")
+        verbose_name_plural = _("Services") 
+         
+         
+class Rating(models.Model):
+
+    """Rating model"""
+
+    RATE_CHOICES = (
+        (1, _('Ok')),
+        (2, _('Fine')),
+        (3, _('Good')),
+        (4, _('Amazing')),
+        (5, _('Incredible'))
+    )
+    
+    first_name = models.CharField(verbose_name=_('First Name'), max_length=150)
+    last_name = models.CharField(verbose_name=_('Last Name'), max_length=150)
+    
+    doctor = models.ForeignKey(
+        to=Doctor,
+        verbose_name=_('Rated doctor'),
+        related_name='ratings',
+        on_delete=models.CASCADE
+    )
+    
+    rate = models.PositiveSmallIntegerField(_('Rate'),choices=RATE_CHOICES)
+    review = models.TextField(_('Review text'))
+
+    # Create and update dates
+    created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
+
+    class Meta:
+        verbose_name = _('Rating')
+        verbose_name_plural = _('Ratings')
