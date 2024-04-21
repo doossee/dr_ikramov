@@ -10,69 +10,59 @@ from src.management.models import *
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """ """
+
+    """User model viewset"""
+    
     queryset = User.objects.all()
     serializer_class = UserSerializer
     # parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
-        match self.action:
-            case "signup":
-                self.permission_classes = []
-            case "verify":
-                self.permission_classes = []
-            case "regenerate_verify_code":
-                self.permission_classes = []
-            case "reset_password":
-                self.permission_classes = []
-            case _:
-                self.permission_classes = super().permission_classes
+        action = self.action
+        
+        if action in ["signup", "verify", "regenerate_verify_code", "reset_password"]:
+            self.permission_classes = []
+        else:
+            self.permission_classes = super().permission_classes
 
         return super(UserViewSet, self).get_permissions()
 
     def get_serializer_class(self):
-        match self.action:
-            case "me":
-                match self.request.user.user_type:
-                    case "ADMIN":
-                        return MeAdminSerializer
-                    case "DOCTOR":
-                        return MeDoctorSerializer
-                    case "PATIENT":
-                        return MePatientSerializer
-                    case _:
-                        return super().get_serializer_class()
+        action = self.action
+        user_type = self.request.user.user_type if hasattr(self.request.user, 'user_type') else None
 
-            case "change_avatar":
-                return ChangeAvatarSerializer
-            case "change_password":
-                return ChangePasswordSerializer
-            case "reset_password":
-                return PhoneSerializer
-            case "regenerate_verify_code":
-                return PhoneSerializer
-            case "verify":
-                return VerifySerializer
-            case _:
-                return super().get_serializer_class()
+        if action == "me":
+            if user_type == "ADMIN":
+                return MeAdminSerializer
+            elif user_type == "DOCTOR":
+                return MeDoctorSerializer
+            elif user_type == "PATIENT":
+                return MePatientSerializer
 
-    def get_object(self):
-        match self.action:
-            case "me":
-                return self.request.user
-            case "change_avatar":
-                return self.request.user
-            case "change_password":
-                return self.request.user
-            case _:
-                return super().get_object()
+        serializer_map = {
+            "change_avatar": ChangeAvatarSerializer,
+            "change_password": ChangePasswordSerializer,
+            "reset_password": PhoneSerializer,
+            "regenerate_verify_code": PhoneSerializer,
+            "verify": VerifySerializer,
+        }
+
+        return serializer_map.get(action, super().get_serializer_class())
+
+
+    def get_object(self):   
+        if self.action in ["me", "change_avatar", "change_password"]:
+            return self.request.user
+
+        return super().get_object()
 
     def get_queryset(self):
-        match self.action:
-            case "monitoring":
-                return self.request.user.monitoring()
-            case _:
-                return super().get_queryset()
+
+        if self.action == "monitoring":
+            return self.request.user.monitoring()
+
+        return super().get_queryset()
+
 
     @action(url_path="me", detail=False, methods=["GET", "PUT", "PATCH"])
     def me(self, request, *args, **kwargs):
@@ -164,8 +154,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class AdminViewSet(viewsets.ModelViewSet):
-    """ """
-
+    
+    """Admin model viewset"""
+    
     queryset = Admin.objects.all()
     serializer_class = AdminSerializer
 
@@ -178,32 +169,55 @@ class AdminViewSet(viewsets.ModelViewSet):
 
 
 class DoctorViewSet(viewsets.ModelViewSet):
-    """ """
-
+    
+    """Doctor model viewset"""
+    
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
 
     
 class PatientViewSet(viewsets.ModelViewSet):
-    """ """
-
+    
+    """Patient model viewset"""
+    
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    search_fields = [
-        'last_name', 
-        'first_name', 
-        'middle_name',
-        'pinfl', 
-        'phone', 
-        'mahalla', 
-        'street',    
-    ]
-    filterset_fields = [
-        'birth_date', 
-        'social_group', 
-        'gender', 
-        'district'
-    ]
+
+    
+class SpecialtyViewSet(viewsets.ModelViewSet):
+
+    """Specialty model viewset"""
+
+    queryset = Specialty.objects.all()
+    serializer_class = SpecialtySerializer
+
+class ServiceCategoryViewSet(viewsets.ModelViewSet):
+
+    """Service category model viewset"""
+    
+    queryset = ServiceCategory.objects.all()
+    serializer_class = ServiceCategorySerializer
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    
+    """Service model viewset"""
+    
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
+
+class InitialRecordViewSet(viewsets.ModelViewSet):
+    
+    """Initial record model viewset"""
+    
+    queryset = InitialRecord.objects.all()
+    serializer_class = InitialRecordSerializer
+
+class RatingViewSet(viewsets.ModelViewSet):
+
+    """Rating model viewset"""
+    
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
 
 
         

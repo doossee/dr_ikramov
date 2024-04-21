@@ -1,5 +1,5 @@
 from core.celery import app
-from utils.helpers import send_sms
+from src.utils.helpers import send_sms
 
 
 @app.task

@@ -194,8 +194,6 @@ class ServiceCategory(models.Model):
         processors=[ik_processors.ResizeToFill(100, 100)],
         format='WEBP',
         options={'quality': 60},
-        null=True,
-        blank=True
     )
     
     is_published = models.BooleanField(verbose_name=_("Publish"), default=False)
@@ -218,8 +216,6 @@ class Service(models.Model):
         processors=[ik_processors.ResizeToFill(100, 100)],
         format='WEBP',
         options={'quality': 60},
-        null=True,
-        blank=True
     )
     
     slug = models.SlugField(verbose_name=_("Slug"), max_length=255, null=True, blank=True)
@@ -244,7 +240,23 @@ class Service(models.Model):
 
     class Meta:
         verbose_name = _("Service")
-        verbose_name_plural = _("Services") 
+        verbose_name_plural = _("Services")
+
+        
+class InitialRecord(models.Model):
+    
+    """Initial record model"""
+
+    first_name = models.CharField(verbose_name=_('First Name'), max_length=150)
+    last_name = models.CharField(verbose_name=_('Last Name'), max_length=150)
+    phone = models.CharField(verbose_name=_("Phone Number"), max_length=15)
+    comment = models.TextField(verbose_name=_("Comment"), blank=True)
+
+    created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('Initial Record')
+        verbose_name_plural = _('Initial Records')
          
          
 class Rating(models.Model):
