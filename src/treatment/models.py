@@ -4,23 +4,37 @@ from datetime import timedelta
 
 from src.management.models import *
 
-class Record(models.Model):
+class Appointment(models.Model):
     
-    """Record model"""
+    """Appointment model"""
     
-    doctor = models.ForeignKey(verbose_name=_("Doctor"), to="Doctor", on_delete=models.CASCADE, related_name='record')
-    patient = models.ForeignKey(verbose_name=_("Patient"), to="Patient", on_delete=models.CASCADE)
+    patient = models.ForeignKey(verbose_name=_("Patient"), to=Patient, on_delete=models.CASCADE, related_name='appointments')
+    doctor = models.ForeignKey(verbose_name=_("Doctor"), to=Doctor, on_delete=models.SET_NULL, related_name='appointments', null=True)
+    service = models.ForeignKey(verbose_name=_("Service"), to=Service, on_delete=models.SET_NULL, related_name='appointments', null=True)
 
     start_time = models.DateTimeField(verbose_name=_("Start Time"))
-    end_time = models.DateTimeField(verbose_name=_("End Time"))
+    end_time = models.DateTimeField(verbose_name=_("End Time"), null=True, blank=True)
     
     created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
 
     class Meta:
-        verbose_name = _("Record")
-        verbose_name_plural = _("Records")
+        verbose_name = _("Appointment")
+        verbose_name_plural = _("Appointments")
 
-    def save(self, *args, **kwargs):
-        self.end_time = self.start_time + timedelta(hours=1)
-        super(Record).save(*args, **kwargs)
+
+class Payment(models.Model):
+
+    """Payment model"""
+
+    CURRENCY_CHOICES = (
+        ('uzs', _('Uzbekistan sum')),
+        ('usd', _('United States dollar')),
+    )
+
+    appointment = models.ForeignKey(verbose_name=_("Appointment"), to=Appointment, on_delete=models.CASCADE, related_name='payments')
+    paid_amount = models.DecimalField(verbose_name=_("Paid amount"))
+    currency = models.CharField(verbose_name=_("Currency"), max_length=3, choices=CURRENCY_CHOICES)
+
+    created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
