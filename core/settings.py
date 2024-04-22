@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     # Project apps
     'src',
     'src.management',
+    'src.treatment',
 ]
 
 MIDDLEWARE = [
