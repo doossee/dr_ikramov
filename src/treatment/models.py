@@ -33,7 +33,7 @@ class Payment(models.Model):
     )
 
     appointment = models.ForeignKey(verbose_name=_("Appointment"), to=Appointment, on_delete=models.CASCADE, related_name='payments')
-    paid_amount = models.DecimalField(verbose_name=_("Paid amount"))
+    paid_amount = models.DecimalField(verbose_name=_("Paid amount"), max_digits=11, decimal_places=2)
     currency = models.CharField(verbose_name=_("Currency"), max_length=3, choices=CURRENCY_CHOICES)
 
     created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
