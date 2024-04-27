@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
+from django.utils.text import slugify
 
 from solo.models import SingletonModel
 from imagekit import models as ik_models, processors as ik_processors 
@@ -118,18 +119,17 @@ class Doctor(User):
 
     """Doctor user model"""
 
-    licences = models.TextField(verbose_name=_("Licences"), blank=True)
+    specialties = models.ManyToManyField(verbose_name=_("Specialty"), to="Specialty", blank=True, related_name="doctors")
+
     experience = models.IntegerField(verbose_name=_("Experience"), null=True, blank=True)
     experiences = models.TextField(verbose_name=_("Experiences"), blank=True)
+    
+    licences = models.TextField(verbose_name=_("Licences"), blank=True)
     educations = models.TextField(verbose_name=_("Educations"), blank=True)
     certificates = models.TextField(verbose_name=_("Certificates"), blank=True)
 
     content = models.TextField(verbose_name=_("Content"), blank=True)
     rating = models.DecimalField(verbose_name=_("Rating"), max_digits=3, decimal_places=2)
-
-    tg_acc = models.CharField(verbose_name=_("Telegram"), max_length=150, blank=True)
-    inst_acc = models.CharField(verbose_name=_("Instagram"), max_length=150, blank=True)
-    fb_acc = models.CharField(verbose_name=_("Facebook"), max_length=150, blank=True)
     
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
     
@@ -153,8 +153,6 @@ class Specialty(models.Model):
 
     """Specialty model"""
     
-    doctor = models.ForeignKey(verbose_name=_("Doctor"), to="Doctor", on_delete=models.CASCADE)
-
     name = models.CharField(verbose_name=_("Name"), max_length=150)
     name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=150)
     name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=150)
@@ -187,6 +185,8 @@ class ServiceCategory(models.Model):
     name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=255)
     name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=255)
     
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=255, null=True, blank=True)
+    
     # Image and thumbnail
     image = models.ImageField(verbose_name=_('Image'), upload_to='service_categories', null=True, blank=True)
     thumbnail = ik_models.ImageSpecField(
@@ -205,11 +205,21 @@ class ServiceCategory(models.Model):
         verbose_name = _("Service Category")
         verbose_name_plural = _("Service Categories")
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
 
 class Service(models.Model):
 
     """Service model"""
        
+    name = models.CharField(verbose_name=_("Name"), max_length=150)
+    name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=150)
+    name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=150)
+    
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=255, null=True, blank=True)
+    
     image = models.ImageField(verbose_name=_('Image'), upload_to='services', null=True, blank=True)
     thumbnail = ik_models.ImageSpecField(
         source='image',
@@ -218,21 +228,15 @@ class Service(models.Model):
         options={'quality': 60},
     )
     
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=255, null=True, blank=True)
-    
-    name = models.CharField(verbose_name=_("Name"), max_length=150)
-    name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=150)
-    name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=150)
-
     category = models.ForeignKey(verbose_name=_("Category"), to=ServiceCategory, on_delete=models.CASCADE)
 
     description = models.TextField(verbose_name=_("Description"), null=True, blank=True)
     description_ru = models.TextField(verbose_name=_("Description (Russian)"), null=True, blank=True)
     description_uz = models.TextField(verbose_name=_("Description (Uzbek)"), null=True, blank=True)
 
-    price = models.IntegerField(verbose_name=_("Price"))
+    price = models.DecimalField(verbose_name=_("Price"),max_digits=11, decimal_places=2)
     
-    content = models.TextField(verbose_name=_("Content"))
+    content = models.TextField(verbose_name=_("Content"), blank=True)
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
 
     created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
@@ -241,6 +245,10 @@ class Service(models.Model):
     class Meta:
         verbose_name = _("Service")
         verbose_name_plural = _("Services")
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
         
 class InitialRecord(models.Model):

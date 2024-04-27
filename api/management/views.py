@@ -5,8 +5,11 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from drf_yasg.utils import swagger_auto_schema
+
 from .serializers import *
 from src.management.models import *
+from api.base import MultiSerializerMixin
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -15,7 +18,6 @@ class UserViewSet(viewsets.ModelViewSet):
     
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    # parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         action = self.action
@@ -168,14 +170,18 @@ class AdminViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class DoctorViewSet(viewsets.ModelViewSet):
+class DoctorViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
     
     """Doctor model viewset"""
     
-    queryset = Doctor.objects.all()
+    queryset = Doctor.objects.all().prefetch_related('specialties')
     serializer_class = DoctorSerializer
-
+    serializer_action_classes = {
+        "list": DoctorGetSerializer,
+        "retrieve": DoctorGetSerializer
+    }
     
+
 class PatientViewSet(viewsets.ModelViewSet):
     
     """Patient model viewset"""
@@ -190,6 +196,7 @@ class SpecialtyViewSet(viewsets.ModelViewSet):
 
     queryset = Specialty.objects.all()
     serializer_class = SpecialtySerializer
+    
 
 class ServiceCategoryViewSet(viewsets.ModelViewSet):
 
@@ -197,6 +204,8 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
     
     queryset = ServiceCategory.objects.all()
     serializer_class = ServiceCategorySerializer
+    lookup_field = 'slug'
+
 
 class ServiceViewSet(viewsets.ModelViewSet):
     
@@ -204,6 +213,8 @@ class ServiceViewSet(viewsets.ModelViewSet):
     
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+    lookup_field = 'slug'
+
 
 class InitialRecordViewSet(viewsets.ModelViewSet):
     
@@ -211,6 +222,7 @@ class InitialRecordViewSet(viewsets.ModelViewSet):
     
     queryset = InitialRecord.objects.all()
     serializer_class = InitialRecordSerializer
+
 
 class RatingViewSet(viewsets.ModelViewSet):
 

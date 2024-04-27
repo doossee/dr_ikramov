@@ -21,7 +21,7 @@ SECRET_KEY = getattr(settings, "SECRET_KEY", 'django-insecure-0ln2$jzy7-8!-f)+n7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getattr(settings, "DEBUG", True)
 
-ALLOWED_HOSTS = getattr(settings, "ALLOWED_HOSTS", [])
+ALLOWED_HOSTS = getattr(settings, "ALLOWED_HOSTS", ["*"])
 INTERNAL_IPS  = getattr(settings, "INTERNAL_IPS", ["127.0.0.1"])
 
 # SECURITY CERTIFICATE

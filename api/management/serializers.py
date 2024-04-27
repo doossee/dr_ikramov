@@ -95,7 +95,7 @@ class MePatientSerializer(serializers.ModelSerializer):
     
     class Meta(ProfileMeta):
         model = Patient
-
+        
 
 class SpecialtySerializer(serializers.ModelSerializer):
     
@@ -104,6 +104,15 @@ class SpecialtySerializer(serializers.ModelSerializer):
     class Meta:
         model = Specialty
         fields = "__all__"
+
+
+class DoctorGetSerializer(serializers.ModelSerializer):
+
+    """Doctor model serializer"""
+
+    specialties = SpecialtySerializer(many=True, read_only=True)
+    class Meta(ProfileMeta):
+        model = Doctor
 
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
