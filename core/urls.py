@@ -3,8 +3,8 @@ from django.urls import path, include
 from django.contrib import admin
 from django.conf.urls.static import static
 
-from api.urls import router
-from api.views import LogoutView
+from src.urls import router
+from src.views import LogoutView
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.views import (

@@ -1,6 +1,6 @@
 from core.routers import DefaultRouter
-from api.management.urls import router as management_router
-from api.treatment.urls import router as treatment_router
+from src.management.urls import router as management_router
+from src.treatment.urls import router as treatment_router
 
 
 router = DefaultRouter()
