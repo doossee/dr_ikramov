@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third party package
+    # 3rd party package
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -80,7 +80,7 @@ MIDDLEWARE = [
 
 if DEBUG:
     MIDDLEWARE += [
-        'core.middleware.ErrorMiddleware',
+        # 'core.middleware.ErrorMiddleware',
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     ]
 

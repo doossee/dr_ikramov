@@ -115,15 +115,6 @@ class DoctorGetSerializer(serializers.ModelSerializer):
         model = Doctor
 
 
-class ServiceCategorySerializer(serializers.ModelSerializer):
-
-    """Service category model serializer"""
-    
-    class Meta:
-        model = ServiceCategory
-        fields = "__all__"
-
-
 class ServiceSerializer(serializers.ModelSerializer):
 
     """Service model serializer"""

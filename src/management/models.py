@@ -17,7 +17,7 @@ from .managers import UserManager
 from .services.tasks import send_password, send_verify_code
 
 
-class User(AbstractUser, PermissionsMixin):
+class User(AbstractUser):
 
     """Main user"""
 
@@ -47,6 +47,9 @@ class User(AbstractUser, PermissionsMixin):
         db_table = "user"
         verbose_name = _("User")
         verbose_name_plural = _("Users")
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
     def save(self, *args, **kwargs):
         self.user_type = self.get_user_type()
@@ -114,6 +117,9 @@ class Admin(User, SingletonModel):
         db_table = "admin"
         verbose_name = _("Admin")
 
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+
 
 class Doctor(User):
 
@@ -129,7 +135,7 @@ class Doctor(User):
     certificates = models.TextField(verbose_name=_("Certificates"), blank=True)
 
     content = models.TextField(verbose_name=_("Content"), blank=True)
-    rating = models.DecimalField(verbose_name=_("Rating"), max_digits=3, decimal_places=2)
+    rating = models.DecimalField(verbose_name=_("Rating"), max_digits=3, decimal_places=2, default=0)
     
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
     
@@ -137,6 +143,9 @@ class Doctor(User):
         db_table = "doctor"
         verbose_name = _("Doctor")
         verbose_name_plural = _("Doctors")
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"
 
 
 class Patient(User):
@@ -153,7 +162,7 @@ class Specialty(models.Model):
 
     """Specialty model"""
     
-    name = models.CharField(verbose_name=_("Name"), max_length=150)
+    name_en = models.CharField(verbose_name=_("Name"), max_length=150)
     name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=150)
     name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=150)
 
@@ -176,47 +185,22 @@ class Specialty(models.Model):
         verbose_name = _("Specialty")
         verbose_name_plural = _("Specialties")
 
-
-class ServiceCategory(models.Model):
-
-    """Service category model"""
-    
-    name = models.CharField(verbose_name=_("Name"), max_length=255, null=True, blank=True)
-    name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=255)
-    name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=255)
-    
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=255, null=True, blank=True)
-    
-    # Image and thumbnail
-    image = models.ImageField(verbose_name=_('Image'), upload_to='service_categories', null=True, blank=True)
-    thumbnail = ik_models.ImageSpecField(
-        source='image',
-        processors=[ik_processors.ResizeToFill(100, 100)],
-        format='WEBP',
-        options={'quality': 60},
-    )
-    
-    is_published = models.BooleanField(verbose_name=_("Publish"), default=False)
-
-    created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
-    updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
-
-    class Meta:
-        verbose_name = _("Service Category")
-        verbose_name_plural = _("Service Categories")
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
+    def __str__(self) -> str:
+        return self.name_en
 
 
 class Service(models.Model):
 
     """Service model"""
        
-    name = models.CharField(verbose_name=_("Name"), max_length=150)
+    name_en = models.CharField(verbose_name=_("Name"), max_length=150)
     name_ru = models.CharField(verbose_name=_("Name (Russian)"), max_length=150)
     name_uz = models.CharField(verbose_name=_("Name (Uzbek)"), max_length=150)
+
+    category = models.CharField(verbose_name=_("Category"), max_length=30, choices=CategoryChoices.choices)
+
+    price_start = models.DecimalField(verbose_name=_("Service price start"), max_digits=11, decimal_places=2)
+    price_end = models.DecimalField(verbose_name=_("Service price end"), max_digits=11, decimal_places=2)
     
     slug = models.SlugField(verbose_name=_("Slug"), max_length=255, null=True, blank=True)
     
@@ -227,18 +211,17 @@ class Service(models.Model):
         format='WEBP',
         options={'quality': 60},
     )
-    
-    category = models.ForeignKey(verbose_name=_("Category"), to=ServiceCategory, on_delete=models.CASCADE)
 
-    description = models.TextField(verbose_name=_("Description"), null=True, blank=True)
+    description_en = models.TextField(verbose_name=_("Description"), null=True, blank=True)
     description_ru = models.TextField(verbose_name=_("Description (Russian)"), null=True, blank=True)
     description_uz = models.TextField(verbose_name=_("Description (Uzbek)"), null=True, blank=True)
 
-    price = models.DecimalField(verbose_name=_("Price"),max_digits=11, decimal_places=2)
     
     content = models.TextField(verbose_name=_("Content"), blank=True)
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
 
+    # <-----Create and update dates----->
+    
     created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
 
@@ -246,8 +229,11 @@ class Service(models.Model):
         verbose_name = _("Service")
         verbose_name_plural = _("Services")
 
+    def __str__(self) -> str:
+        return self.name_en
+    
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        self.slug = slugify(self.name_en)
         super().save(*args, **kwargs)
 
         
@@ -260,42 +246,42 @@ class InitialRecord(models.Model):
     phone = models.CharField(verbose_name=_("Phone Number"), max_length=15)
     comment = models.TextField(verbose_name=_("Comment"), blank=True)
 
+    # <-----Create date-----> #
+    
     created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
 
     class Meta:
         verbose_name = _('Initial Record')
         verbose_name_plural = _('Initial Records')
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"
          
          
 class Rating(models.Model):
 
     """Rating model"""
 
-    RATE_CHOICES = (
-        (1, _('Ok')),
-        (2, _('Fine')),
-        (3, _('Good')),
-        (4, _('Amazing')),
-        (5, _('Incredible'))
-    )
     
     first_name = models.CharField(verbose_name=_('First Name'), max_length=150)
     last_name = models.CharField(verbose_name=_('Last Name'), max_length=150)
     
     doctor = models.ForeignKey(
-        to=Doctor,
-        verbose_name=_('Rated doctor'),
-        related_name='ratings',
-        on_delete=models.CASCADE
+        verbose_name=_('Rated doctor'), to=Doctor, related_name='ratings',
+        on_delete=models.SET_NULL, blank=True, null=True
     )
     
-    rate = models.PositiveSmallIntegerField(_('Rate'),choices=RATE_CHOICES)
+    rate = models.PositiveSmallIntegerField(_('Rate'), choices=RateChoices.choices)
     review = models.TextField(_('Review text'))
 
-    # Create and update dates
+    # <-----Create and update dates-----> #
+    
     created_at = models.DateTimeField(verbose_name=_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated At"), auto_now=True)
 
     class Meta:
         verbose_name = _('Rating')
         verbose_name_plural = _('Ratings')
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"

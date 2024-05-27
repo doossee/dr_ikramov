@@ -198,15 +198,6 @@ class SpecialtyViewSet(viewsets.ModelViewSet):
     serializer_class = SpecialtySerializer
     
 
-class ServiceCategoryViewSet(viewsets.ModelViewSet):
-
-    """Service category model viewset"""
-    
-    queryset = ServiceCategory.objects.all()
-    serializer_class = ServiceCategorySerializer
-    lookup_field = 'slug'
-
-
 class ServiceViewSet(viewsets.ModelViewSet):
     
     """Service model viewset"""
