@@ -216,7 +216,6 @@ class Service(models.Model):
     description_ru = models.TextField(verbose_name=_("Description (Russian)"), null=True, blank=True)
     description_uz = models.TextField(verbose_name=_("Description (Uzbek)"), null=True, blank=True)
 
-    
     content = models.TextField(verbose_name=_("Content"), blank=True)
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
 
