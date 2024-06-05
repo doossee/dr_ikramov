@@ -115,7 +115,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
 
-    'DEFAULT_PAGINATION_CLASS': 'src.views.CustomPagination',
+    'DEFAULT_PAGINATION_CLASS': 'src.pagination.CustomPagination',
     'PAGE_SIZE': 30,
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
