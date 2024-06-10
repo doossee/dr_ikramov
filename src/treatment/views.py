@@ -95,9 +95,22 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
         
         report, created = Report.objects.update_or_create(date=date)
 
-        profit = Profit.objects.create(
+        Profit.objects.create(
             report=report, appointment=appointment, amount=amount
         )
+        
+        # Re-query the report to include the annotations
+        report = Report.objects.filter(id=report.id).annotate(
+            total_profit=Coalesce(Sum('profits__amount'), 0, output_field=DecimalField()),
+            total_consumption=Coalesce(Sum('consumptions__amount'), 0, output_field=DecimalField()),
+            net_profit=ExpressionWrapper(
+                F('total_profit') - F('total_consumption'),
+                output_field=DecimalField(max_digits=11, decimal_places=2)
+            )
+        ).prefetch_related(
+            Prefetch('profits', queryset=Profit.objects.all().select_related('appointment')),
+            Prefetch('consumptions', queryset=Consumption.objects.all())
+        ).first()
                 
         # Возвращаем созданный объект или его данные в ответе
         return Response(ReportSerializer(report).data)
@@ -119,9 +132,22 @@ class ReportViewSet(viewsets.ReadOnlyModelViewSet):
         
         report, created = Report.objects.update_or_create(date=date)
 
-        profit = Consumption.objects.create(
+        Consumption.objects.create(
             report=report, title=title, description=description, amount=amount
         )
+        
+        # Re-query the report to include the annotations
+        report = Report.objects.filter(id=report.id).annotate(
+            total_profit=Coalesce(Sum('profits__amount'), 0, output_field=DecimalField()),
+            total_consumption=Coalesce(Sum('consumptions__amount'), 0, output_field=DecimalField()),
+            net_profit=ExpressionWrapper(
+                F('total_profit') - F('total_consumption'),
+                output_field=DecimalField(max_digits=11, decimal_places=2)
+            )
+        ).prefetch_related(
+            Prefetch('profits', queryset=Profit.objects.all().select_related('appointment')),
+            Prefetch('consumptions', queryset=Consumption.objects.all())
+        ).first()
                 
         # Возвращаем созданный объект или его данные в ответе
         return Response(ReportSerializer(report).data)
