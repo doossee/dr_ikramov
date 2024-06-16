@@ -7,4 +7,3 @@
 # @receiver(post_save, sender=Station)
 # def calculate_provider_organization_balance(sender, instance, **kwargs):
 #     instance.organization.calculate_balance()
-

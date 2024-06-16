@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 class UserManager(BaseUserManager):
     """ """
+
     def create_user(self, phone, password=None):
         if not phone:
             raise ValueError(_("Users must have a phone"))
@@ -23,5 +24,3 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
-
-

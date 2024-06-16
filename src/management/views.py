@@ -13,15 +13,14 @@ from src.base import MultiSerializerMixin
 
 
 class UserViewSet(viewsets.ModelViewSet):
-
     """User model viewset"""
-    
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def get_permissions(self):
         action = self.action
-        
+
         if action in ["signup", "verify", "regenerate_verify_code", "reset_password"]:
             self.permission_classes = []
         else:
@@ -31,7 +30,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         action = self.action
-        user_type = self.request.user.user_type if hasattr(self.request.user, 'user_type') else None
+        user_type = (
+            self.request.user.user_type
+            if hasattr(self.request.user, "user_type")
+            else None
+        )
 
         if action == "me":
             if user_type == "ADMIN":
@@ -51,8 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return serializer_map.get(action, super().get_serializer_class())
 
-
-    def get_object(self):   
+    def get_object(self):
         if self.action in ["me", "change_avatar", "change_password"]:
             return self.request.user
 
@@ -64,7 +66,6 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.request.user.monitoring()
 
         return super().get_queryset()
-
 
     @action(url_path="me", detail=False, methods=["GET", "PUT", "PATCH"])
     def me(self, request, *args, **kwargs):
@@ -101,17 +102,29 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-                instance = self.queryset.get(phone=serializer.validated_data.get("phone"))
+                instance = self.queryset.get(
+                    phone=serializer.validated_data.get("phone")
+                )
                 if instance.reset_password():
                     return Response(
-                        {"success": _("The password has been reset and sent to your phone number!")},
-                        status=status.HTTP_200_OK
+                        {
+                            "success": _(
+                                "The password has been reset and sent to your phone number!"
+                            )
+                        },
+                        status=status.HTTP_200_OK,
                     )
-                return Response({"message": _("Error sending the message!")}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": _("Error sending the message!")},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
         except User.DoesNotExist:
-            return Response({"message": _("The user with this phone has not been found!")}, status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": _("The user with this phone has not been found!")},
+                status.HTTP_404_NOT_FOUND,
+            )
 
     @action(url_path="signup", detail=False, methods=["POST"])
     def signup(self, request):
@@ -127,14 +140,25 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-                instance = self.queryset.get(phone=serializer.validated_data.get("phone"))
+                instance = self.queryset.get(
+                    phone=serializer.validated_data.get("phone")
+                )
                 if instance.regenerate_verify_code():
-                    return Response({"success": _("The verification code sent!")}, status=status.HTTP_200_OK)
-                return Response({"message": _("Error sending the message!")}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {"success": _("The verification code sent!")},
+                        status=status.HTTP_200_OK,
+                    )
+                return Response(
+                    {"message": _("Error sending the message!")},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
         except User.DoesNotExist:
-            return Response({"message": _("The user with this phone has not been found!")}, status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": _("The user with this phone has not been found!")},
+                status.HTTP_404_NOT_FOUND,
+            )
 
     @action(url_path="verify", detail=False, methods=["POST"])
     def verify(self, request):
@@ -144,21 +168,26 @@ class UserViewSet(viewsets.ModelViewSet):
                 data = serializer.validated_data
                 instance = self.queryset.get(phone=data.get("phone"))
                 if instance.verify(data.get("code")):
-                    return Response({"success": _("The user is verified!")}, status=status.HTTP_200_OK)
+                    return Response(
+                        {"success": _("The user is verified!")},
+                        status=status.HTTP_200_OK,
+                    )
                 return Response(
                     {"message": _("Verify error timeout or invalid code!")},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
         except ObjectDoesNotExist:
-            return Response({"message": _("The user with this phone has not been found!")}, status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": _("The user with this phone has not been found!")},
+                status.HTTP_404_NOT_FOUND,
+            )
 
 
 class AdminViewSet(viewsets.ModelViewSet):
-    
     """Admin model viewset"""
-    
+
     queryset = Admin.objects.all()
     serializer_class = AdminSerializer
 
@@ -171,59 +200,52 @@ class AdminViewSet(viewsets.ModelViewSet):
 
 
 class DoctorViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
-    
     """Doctor model viewset"""
-    
-    queryset = Doctor.objects.all().prefetch_related('specialties')
+
+    queryset = Doctor.objects.all().prefetch_related("specialties")
     serializer_class = DoctorSerializer
     serializer_action_classes = {
         "list": DoctorGetSerializer,
-        "retrieve": DoctorGetSerializer
+        "retrieve": DoctorGetSerializer,
     }
-    
+
 
 class PatientViewSet(viewsets.ModelViewSet):
-    
     """Patient model viewset"""
-    
+
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     search_fields = [
-        'id'
-        'last_name', 
-        'first_name', 
-        'middle_name',
+        "id" "last_name",
+        "first_name",
+        "middle_name",
     ]
 
-    
-class SpecialtyViewSet(viewsets.ModelViewSet):
 
+class SpecialtyViewSet(viewsets.ModelViewSet):
     """Specialty model viewset"""
 
     queryset = Specialty.objects.all()
     serializer_class = SpecialtySerializer
-    
+
 
 class ServiceViewSet(viewsets.ModelViewSet):
-    
     """Service model viewset"""
-    
+
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    lookup_field = 'slug'
+    lookup_field = "slug"
 
 
 class InitialRecordViewSet(viewsets.ModelViewSet):
-    
     """Initial record model viewset"""
-    
+
     queryset = InitialRecord.objects.all()
     serializer_class = InitialRecordSerializer
 
 
 class RatingViewSet(viewsets.ModelViewSet):
-
     """Rating model viewset"""
-    
+
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer

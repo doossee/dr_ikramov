@@ -1,0 +1,7 @@
+openapi: 3.0.3
+info:
+  title: dr_ikramov
+  version: 1.0.0
+  description: Dental clinic web-site backend
+paths: {}
+components: {}
