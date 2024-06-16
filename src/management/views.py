@@ -216,7 +216,8 @@ class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     search_fields = [
-        "id" "last_name",
+        "id",
+        "last_name",
         "first_name",
         "middle_name",
     ]
