@@ -26,7 +26,6 @@ SECRET_KEY = getattr(
 DEBUG = getattr(settings, "DEBUG", True)
 
 ALLOWED_HOSTS = getattr(settings, "ALLOWED_HOSTS", ["*"])
-INTERNAL_IPS = getattr(settings, "INTERNAL_IPS", ["127.0.0.1"])
 
 # SECURITY CERTIFICATE
 SECURE_PROXY_SSL_HEADER = (
@@ -66,7 +65,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
-    "debug_toolbar",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     # Project apps
@@ -87,10 +85,16 @@ MIDDLEWARE = [
 ]
 
 if DEBUG:
-    MIDDLEWARE += [
-        # 'core.middleware.ErrorMiddleware',
-        "debug_toolbar.middleware.DebugToolbarMiddleware",
-    ]
+    MIDDLEWARE += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )
+    INTERNAL_IPS = ('127.0.0.1', )
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+    }
 
 ROOT_URLCONF = "core.urls"
 WSGI_APPLICATION = "core.wsgi.application"

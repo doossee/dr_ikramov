@@ -16,7 +16,6 @@ from src.views import LogoutView
 
 
 urlpatterns = [
-    path("__debug__/", include("debug_toolbar.urls")),
     path("admin/", admin.site.urls),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
@@ -30,10 +29,9 @@ if settings.DEBUG:
 
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns = [
-        # YOUR PATTERNS
+    urlpatterns += [
+        path("__debug__/", include(debug_toolbar.urls)),
         path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-        # Optional UI:
         path(
             "api/schema/swagger-ui/",
             SpectacularSwaggerView.as_view(url_name="schema"),
