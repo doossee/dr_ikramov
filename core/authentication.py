@@ -14,7 +14,6 @@ from src.management.models import Admin, Doctor, Patient
 
 
 class DevAuthentication(SessionAuthentication):
-
     def authenticate(self, request):
         """ """
         user = getattr(request._request, "user", None)

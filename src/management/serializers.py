@@ -1,12 +1,26 @@
-from django.utils.translation import gettext_lazy as _
-
 from rest_framework import serializers
 
-from src.management.models import *
+from src.management.models import (
+    User,
+    Admin,
+    Doctor,
+    Patient,
+    Specialty,
+    Service,
+    InitialRecord,
+    Rating,
+)
 
 
 class ProfileMeta:
-    exclude = ["password", "is_staff", "is_superuser", "verify_time", "verify_code"]
+    exclude = [
+        "password",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "verify_time",
+        "verify_code",
+    ]
     read_only_fields = [
         "username",
         "user_type",

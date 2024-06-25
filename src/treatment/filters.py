@@ -13,7 +13,6 @@ class AppointmentFilter(filters.FilterSet):
 
 
 class ReportFilter(filters.FilterSet):
-
     class Meta:
         model = Report
         fields = [

@@ -3,7 +3,8 @@ from datetime import date
 
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.core.validators import MaxValueValidator
+from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
@@ -12,7 +13,7 @@ from django.utils.text import slugify
 from solo.models import SingletonModel
 from imagekit import models as ik_models, processors as ik_processors
 
-from .choices import *
+from .choices import *  # noqa: F403
 from .managers import UserManager
 from .services.tasks import send_password, send_verify_code
 
@@ -156,6 +157,10 @@ class Doctor(User):
         verbose_name=_("Rating"), max_digits=3, decimal_places=2, default=0
     )
 
+    balance = models.DecimalField(
+        verbose_name=_("Balance"), max_digits=11, decimal_places=2
+    )
+
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
 
     class Meta:
@@ -225,6 +230,11 @@ class Service(models.Model):
     )
     price_end = models.DecimalField(
         verbose_name=_("Service price end"), max_digits=11, decimal_places=2
+    )
+
+    kpi_percent = models.PositiveIntegerField(
+        verbose_name=_("KPI percent"),
+        validators=[MaxValueValidator(100)],
     )
 
     slug = models.SlugField(

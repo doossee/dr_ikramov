@@ -59,7 +59,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().get_object()
 
     def get_queryset(self):
-
         if self.action == "monitoring":
             return self.request.user.monitoring()
 
