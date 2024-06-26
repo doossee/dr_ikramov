@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from services.tasks import send_password, send_verify_code
+from .services.tasks import send_password, send_verify_code
 
 
 def change_password(user, password, new_password, confirm_password):
