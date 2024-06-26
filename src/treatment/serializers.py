@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from src.management.models import Doctor, Patient, Service
-from .models import Appointment, Report, Profit, Consumption
+from .models import Appointment, Report, Profit, Consumption, Salary
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -74,15 +74,15 @@ class ConsumptionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ReportSerializer(serializers.ModelSerializer):
-    """Report model serializer"""
+# class ReportSerializer(serializers.ModelSerializer):
+#     """Report model serializer"""
 
-    profits = ProfitSerializer(many=True, read_only=True)
-    consumptions = ConsumptionSerializer(many=True, read_only=True)
+#     profits = ProfitSerializer(many=True, read_only=True)
+#     consumptions = ConsumptionSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Report
-        fields = "__all__"
+#     class Meta:
+#         model = Report
+#         fields = "__all__"
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -133,3 +133,11 @@ class ConsumptionWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Consumption
         exclude = ["report"]
+
+
+class SalarySerializer(serializers.ModelSerializer):
+    """Salary model serializer"""
+
+    class Meta:
+        model = Salary
+        fields = "__all__"

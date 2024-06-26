@@ -1,4 +1,3 @@
-from datetime import datetime
 from dateutil import parser as date_parser
 from django.db.models import Prefetch, Sum, F, ExpressionWrapper, DecimalField
 from django.db.models.functions import Coalesce
@@ -8,13 +7,14 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 
 from src.base import MultiSerializerMixin
-from src.treatment.models import Appointment, Report, Profit, Consumption
+from src.treatment.models import Appointment, Report, Profit, Consumption, Salary
 from .serializers import (
     AppointmentSerializer,
     AppointmentReadSerializer,
     ReportSerializer,
     ProfitWriteSerializer,
     ConsumptionWriteSerializer,
+    SalarySerializer,
 )
 from .filters import AppointmentFilter, ReportFilter
 
@@ -166,3 +166,15 @@ class ReportViewSet(
             )
             .first()
         )
+
+
+class SalaryViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Salary model view set"""
+
+    queryset = Salary.objects.all()
+    serializer_class = SalarySerializer

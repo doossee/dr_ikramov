@@ -1,21 +1,19 @@
-from random import randint
 from datetime import date
 
 from django.db import models
-from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator
-from django.contrib.auth.models import AbstractUser
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.validators import MaxValueValidator
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractUser
 
 from solo.models import SingletonModel
 from imagekit import models as ik_models, processors as ik_processors
 
-from .choices import *  # noqa: F403
+from .choices import UserTypeChoices, CategoryChoices, RateChoices
 from .managers import UserManager
-from .services.tasks import send_password, send_verify_code
+from .utils import change_password, reset_password, change_avatar, generate_verify_code, verify_user
 
 
 class User(AbstractUser):
@@ -79,48 +77,19 @@ class User(AbstractUser):
             return self.user_type
 
     def change_password(self, password, new_password, confirm_password):
-        """ """
-        if not self.check_password(password):
-            raise ValidationError(_("Password is incorrect!"))
-
-        if new_password != confirm_password:
-            raise ValidationError(
-                _("New password and confirmation password are equal!")
-            )
-
-        self.set_password(confirm_password)
-        super().save()
+        change_password(self, password, new_password, confirm_password)
 
     def reset_password(self):
-        password = randint(100000, 999999)
-        self.set_password(str(password))
-        super().save()
-        return send_password.delay(self.phone, password)
+        reset_password(self)
 
     def change_avatar(self, avatar):
-        self.avatar = avatar
-        super().save()
+        change_avatar(self, avatar)
 
     def generate_verify_code(self):
-        code = randint(1000, 9999)
-        self.is_active = False
-        self.verify_code = code
-        self.verify_time = timezone.now() + timezone.timedelta(
-            minutes=settings.VERIFY_CODE_MINUTES
-        )
-        return send_verify_code.delay(self.phone, code)
-
-    def regenerate_verify_code(self):
-        result = self.generate_verify_code()
-        super().save()
-        return result
+        generate_verify_code(self)
 
     def verify(self, code):
-        if self.verify_code == code and self.verify_time >= timezone.now():
-            self.is_active = True
-            super().save()
-            return True
-        return False
+        return verify_user(self, code)
 
 
 class Admin(User, SingletonModel):
