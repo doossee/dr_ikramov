@@ -7,7 +7,7 @@ class AppointmentFilter(filters.FilterSet):
     start_time = filters.DateTimeFilter(field_name="start_time", lookup_expr="gte")
     end_time = filters.DateTimeFilter(field_name="end_time", lookup_expr="lte")
     patient_search = filters.CharFilter(method="filter_by_patient_name")
-
+    
     class Meta:
         model = Appointment
         fields = [

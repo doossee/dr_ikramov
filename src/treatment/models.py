@@ -2,7 +2,11 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from src.management.models import Patient, Doctor, Service
 from .choices import StatusChoices
-from .services import update_appointment_status, update_doctor_balance_on_profit, update_doctor_balance_on_salary
+from .services import (
+    update_appointment_status,
+    update_doctor_balance_on_profit,
+    update_doctor_balance_on_salary,
+)
 
 
 class Appointment(models.Model):
@@ -140,6 +144,7 @@ class Salary(models.Model):
     amount = models.DecimalField(
         verbose_name=_("Amount"), max_digits=11, decimal_places=2
     )
+    comment = models.TextField(verbose_name=_("Comment"), blank=True)
     created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
 

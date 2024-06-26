@@ -17,23 +17,29 @@ def change_password(user, password, new_password, confirm_password):
     user.set_password(confirm_password)
     user.save()
 
+
 def reset_password(user):
     password = randint(100000, 999999)
     user.set_password(str(password))
     user.save()
     send_password.delay(user.phone, password)
 
+
 def change_avatar(user, avatar):
     user.avatar = avatar
     user.save()
+
 
 def generate_verify_code(user):
     code = randint(1000, 9999)
     user.is_active = False
     user.verify_code = code
-    user.verify_time = timezone.now() + timezone.timedelta(minutes=settings.VERIFY_CODE_MINUTES)
+    user.verify_time = timezone.now() + timezone.timedelta(
+        minutes=settings.VERIFY_CODE_MINUTES
+    )
     send_verify_code.delay(user.phone, code)
     user.save()
+
 
 def verify_user(user, code):
     if user.verify_code == code and user.verify_time >= timezone.now():

@@ -11,7 +11,9 @@ def update_appointment_status(appointment):
 
 
 def update_doctor_balance_on_profit(profit):
-    profit.appointment.doctor.balance += (profit.amount * profit.appointment.service.kpi_percent) / 100
+    profit.appointment.doctor.balance += (
+        profit.amount * profit.appointment.service.kpi_percent
+    ) / 100
     return profit
 
 

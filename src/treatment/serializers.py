@@ -17,7 +17,7 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ["id", "first_name", "last_name", "phone"]
+        fields = ["id", "first_name", "last_name", "middle_name", "phone"]
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class PatientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = ["id", "first_name", "last_name", "phone"]
+        fields = ["id", "first_name", "last_name", "middle_name", "phone"]
 
 
 class ServiceSerializer(serializers.ModelSerializer):

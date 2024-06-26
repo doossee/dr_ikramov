@@ -1,3 +1,4 @@
+# views.py
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 
@@ -5,15 +6,41 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import *
-from src.management.models import *
-from src.base import MultiSerializerMixin
+from .models import User, Admin
 
+from .repositories import (
+    UserRepository,
+    DoctorRepository,
+    PatientRepository,
+    SpecialtyRepository,
+    ServiceRepository,
+    InitialRecordRepository,
+    RatingRepository
+)
+from .serializers import (
+    UserSerializer,
+    ChangeAvatarSerializer,
+    ChangePasswordSerializer,
+    PhoneSerializer,
+    VerifySerializer,
+    AdminSerializer,
+    MeAdminSerializer,
+    DoctorSerializer,
+    MeDoctorSerializer, 
+    DoctorGetSerializer,
+    PatientSerializer,
+    MePatientSerializer, 
+    SpecialtySerializer,
+    ServiceSerializer,
+    InitialRecordSerializer,
+    RatingSerializer,
+)
+from src.base import MultiSerializerMixin
 
 class UserViewSet(viewsets.ModelViewSet):
     """User model viewset"""
 
-    queryset = User.objects.all()
+    queryset = UserRepository.get()
     serializer_class = UserSerializer
 
     def get_permissions(self):
@@ -99,7 +126,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-                instance = self.queryset.get(
+                instance = UserRepository.get_by_phone(
                     phone=serializer.validated_data.get("phone")
                 )
                 if instance.reset_password():
@@ -128,7 +155,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             data = serializer.validated_data
-            User.objects.signup(**data)
+            UserRepository.signup(**data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -137,7 +164,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-                instance = self.queryset.get(
+                instance = UserRepository.get_by_phone(
                     phone=serializer.validated_data.get("phone")
                 )
                 if instance.regenerate_verify_code():
@@ -163,7 +190,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
                 data = serializer.validated_data
-                instance = self.queryset.get(phone=data.get("phone"))
+                instance = UserRepository.get_by_phone(data.get("phone"))
                 if instance.verify(data.get("code")):
                     return Response(
                         {"success": _("The user is verified!")},
@@ -199,18 +226,24 @@ class AdminViewSet(viewsets.ModelViewSet):
 class DoctorViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
     """Doctor model viewset"""
 
-    queryset = Doctor.objects.all().prefetch_related("specialties")
+    queryset = DoctorRepository.get()
     serializer_class = DoctorSerializer
     serializer_action_classes = {
         "list": DoctorGetSerializer,
         "retrieve": DoctorGetSerializer,
     }
+    search_fields = [
+        "id",
+        "last_name",
+        "first_name",
+        "middle_name",
+    ]
 
 
 class PatientViewSet(viewsets.ModelViewSet):
     """Patient model viewset"""
 
-    queryset = Patient.objects.all()
+    queryset = PatientRepository.get()
     serializer_class = PatientSerializer
     search_fields = [
         "id",
@@ -223,27 +256,32 @@ class PatientViewSet(viewsets.ModelViewSet):
 class SpecialtyViewSet(viewsets.ModelViewSet):
     """Specialty model viewset"""
 
-    queryset = Specialty.objects.all()
+    queryset = SpecialtyRepository.get()
     serializer_class = SpecialtySerializer
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
     """Service model viewset"""
 
-    queryset = Service.objects.all()
+    queryset = ServiceRepository.get()
     serializer_class = ServiceSerializer
     lookup_field = "slug"
+    search_fields = [
+        "name_en",
+        "name_ru",
+        "name_uz",
+    ]
 
 
 class InitialRecordViewSet(viewsets.ModelViewSet):
     """Initial record model viewset"""
 
-    queryset = InitialRecord.objects.all()
+    queryset = InitialRecordRepository.get()
     serializer_class = InitialRecordSerializer
 
 
 class RatingViewSet(viewsets.ModelViewSet):
     """Rating model viewset"""
 
-    queryset = Rating.objects.all()
+    queryset = RatingRepository.get()
     serializer_class = RatingSerializer

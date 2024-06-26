@@ -13,7 +13,13 @@ from imagekit import models as ik_models, processors as ik_processors
 
 from .choices import UserTypeChoices, CategoryChoices, RateChoices
 from .managers import UserManager
-from .utils import change_password, reset_password, change_avatar, generate_verify_code, verify_user
+from .utils import (
+    change_password,
+    reset_password,
+    change_avatar,
+    generate_verify_code,
+    verify_user,
+)
 
 
 class User(AbstractUser):
@@ -257,6 +263,8 @@ class InitialRecord(models.Model):
     first_name = models.CharField(verbose_name=_("First Name"), max_length=150)
     last_name = models.CharField(verbose_name=_("Last Name"), max_length=150)
     phone = models.CharField(verbose_name=_("Phone Number"), max_length=15)
+    
+    is_active = models.BooleanField(_("Is active"), default=True)
     comment = models.TextField(verbose_name=_("Comment"), blank=True)
 
     # <-----Create date-----> #
