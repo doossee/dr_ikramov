@@ -30,7 +30,7 @@ class AppointmentViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
 
 
 class ReportViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     """Report model viewset"""
 
