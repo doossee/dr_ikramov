@@ -10,7 +10,7 @@ class DoctorFilter(filters.FilterSet):
         model = Doctor
         fields = []
 
-    def filter_by_name(self, queryset, name, value):
+    def filter_by_names(self, queryset, name, value):
         return queryset.filter(
             Q(first_name__icontains=value)
             | Q(last_name__icontains=value)
@@ -25,7 +25,7 @@ class PatientFilter(filters.FilterSet):
         model = Patient
         fields = []
 
-    def filter_by_name(self, queryset, name, value):
+    def filter_by_names(self, queryset, name, value):
         return queryset.filter(
             Q(first_name__icontains=value)
             | Q(last_name__icontains=value)
@@ -40,7 +40,7 @@ class ServiceFilter(filters.FilterSet):
         model = Service
         fields = []
 
-    def filter_by_name(self, queryset, name, value):
+    def filter_by_names(self, queryset, name, value):
         return queryset.filter(
             Q(name_en__icontains=value)
             | Q(name_ru__icontains=value)
