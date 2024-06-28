@@ -41,8 +41,10 @@ class Appointment(models.Model):
         choices=StatusChoices.choices,
         default=StatusChoices.PENDING,
     )
-    start_time = models.DateTimeField(verbose_name=_("Start time"))
-    end_time = models.DateTimeField(verbose_name=_("End time"), null=True, blank=True)
+    start_time = models.TimeField(verbose_name=_("Start time"))
+    end_time = models.TimeField(verbose_name=_("End time"), null=True, blank=True)
+    date = models.DateField(verbose_name=_("Date"))
+
     created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
 
@@ -63,6 +65,7 @@ class Report(models.Model):
     """Report model"""
 
     date = models.DateField(verbose_name=_("Date"), unique=True)
+
     created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
 
@@ -121,6 +124,7 @@ class Consumption(models.Model):
     amount = models.DecimalField(
         verbose_name=_("Paid amount"), max_digits=11, decimal_places=2
     )
+
     created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
 
@@ -145,6 +149,7 @@ class Salary(models.Model):
         verbose_name=_("Amount"), max_digits=11, decimal_places=2
     )
     comment = models.TextField(verbose_name=_("Comment"), blank=True)
+    
     created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
 
