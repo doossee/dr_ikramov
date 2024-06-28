@@ -4,8 +4,9 @@ from .models import Appointment, Report
 
 
 class AppointmentFilter(filters.FilterSet):
-    start_time = filters.DateTimeFilter(field_name="start_time", lookup_expr="gte")
-    end_time = filters.DateTimeFilter(field_name="end_time", lookup_expr="lte")
+    start_time = filters.TimeFilter(field_name="start_time", lookup_expr="gte")
+    end_time = filters.TimeFilter(field_name="end_time", lookup_expr="lte")
+    date = filters.DateFilter(field_name="date", lookup_expr="exact")
     patient_search = filters.CharFilter(method="filter_by_patient_name")
     
     class Meta:
