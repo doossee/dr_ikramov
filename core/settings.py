@@ -130,6 +130,7 @@ REST_FRAMEWORK = {
         "core.authentication.DevAuthentication",
         "core.authentication.TokenAuthentication",
     ],
+    "DATE_INPUT_FORMATS": ["%d-%m-%Y"],
     "COERCE_DECIMAL_TO_STRING": False,
 }
 

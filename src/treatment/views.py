@@ -49,7 +49,7 @@ class ReportViewSet(
                 # Validate date using dateutil.parser
                 parsed_date = date_parser.parse(by_date)
                 # Optionally, reformat the date if needed
-                by_date = parsed_date.strftime("%Y-%m-%d")
+                by_date = parsed_date.strftime("%d-%m-%Y")
             except (ValueError, TypeError):
                 raise ValidationError(
                     {"by_date": "Invalid date format. Please use a valid date."}
