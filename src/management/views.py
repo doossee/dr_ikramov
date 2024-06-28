@@ -256,7 +256,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = ServiceRepository.get()
     serializer_class = ServiceSerializer
     lookup_field = "slug"
-    filter_backends = ServiceFilter
+    filterset_class = ServiceFilter
 
 
 class InitialRecordViewSet(viewsets.ModelViewSet):
