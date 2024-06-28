@@ -4,7 +4,7 @@ from .models import Doctor, Patient, Service
 
 
 class DoctorFilter(filters.FilterSet):
-    search = filters.CharFilter(method="filter_by_name")
+    search = filters.CharFilter(method="filter_by_names", label="Search by first_name, last_name and middle_name")
     
     class Meta:
         model = Doctor
@@ -19,7 +19,7 @@ class DoctorFilter(filters.FilterSet):
 
 
 class PatientFilter(filters.FilterSet):
-    search = filters.CharFilter(method="filter_by_name")
+    search = filters.CharFilter(method="filter_by_names", label="Search by first_name, last_name and middle_name")
     
     class Meta:
         model = Patient
@@ -34,7 +34,7 @@ class PatientFilter(filters.FilterSet):
 
 
 class ServiceFilter(filters.FilterSet):
-    search = filters.CharFilter(method="filter_by_name")
+    search = filters.CharFilter(method="filter_by_names", label="Search by name_en, name_ru, name_uz")
     
     class Meta:
         model = Service
