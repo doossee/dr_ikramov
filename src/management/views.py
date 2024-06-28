@@ -6,8 +6,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from src.base import MultiSerializerMixin
 from .models import User, Admin
-
 from .repositories import (
     UserRepository,
     DoctorRepository,
@@ -35,7 +35,7 @@ from .serializers import (
     InitialRecordSerializer,
     RatingSerializer,
 )
-from src.base import MultiSerializerMixin
+from .filters import DoctorFilter, PatientFilter
 
 class UserViewSet(viewsets.ModelViewSet):
     """User model viewset"""
@@ -232,12 +232,7 @@ class DoctorViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
         "list": DoctorGetSerializer,
         "retrieve": DoctorGetSerializer,
     }
-    search_fields = [
-        "id",
-        "last_name",
-        "first_name",
-        "middle_name",
-    ]
+    filterset_class = DoctorFilter
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -245,12 +240,7 @@ class PatientViewSet(viewsets.ModelViewSet):
 
     queryset = PatientRepository.get()
     serializer_class = PatientSerializer
-    search_fields = [
-        "id",
-        "last_name",
-        "first_name",
-        "middle_name",
-    ]
+    filterset_class = PatientFilter
 
 
 class SpecialtyViewSet(viewsets.ModelViewSet):

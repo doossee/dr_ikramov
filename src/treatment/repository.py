@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.db.models import Sum, F, DecimalField, ExpressionWrapper
 from django.db.models.functions import Coalesce
 from django.db.models import Prefetch
@@ -65,14 +64,6 @@ class ReportRepository:
             )
             .first()
         )
-
-    @staticmethod
-    @transaction.atomic
-    def add_entry(date, entry_model, **kwargs):
-        """Add entry (profit or consumption) to the report"""
-        report, _ = Report.objects.update_or_create(date=date)
-        entry_model.objects.create(report=report, **kwargs)
-        return ReportRepository.get_annotated_report(report.id)
 
 
 class SalaryRepository:
