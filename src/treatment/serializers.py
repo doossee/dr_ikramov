@@ -141,3 +141,13 @@ class SalarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Salary
         fields = "__all__"
+
+
+class SalaryReadSerializer(serializers.ModelSerializer):
+    """Appointment model serializer"""
+
+    doctor = DoctorSerializer(read_only=True)
+
+    class Meta:
+        model = Salary
+        fields = "__all__"

@@ -13,6 +13,7 @@ from .serializers import (
     ProfitWriteSerializer,
     ConsumptionWriteSerializer,
     SalarySerializer,
+    SalaryReadSerializer,
 )
 from .filters import AppointmentFilter, ReportFilter
 from .repository import AppointmentRepository, ReportRepository, SalaryRepository
@@ -113,6 +114,7 @@ class ReportViewSet(
 
 
 class SalaryViewSet(
+    MultiSerializerMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
@@ -122,4 +124,8 @@ class SalaryViewSet(
 
     queryset = SalaryRepository.get()
     serializer_class = SalarySerializer
+    serializer_action_classes = {
+        "list": SalaryReadSerializer,
+        "retrieve": SalaryReadSerializer,
+    }
     

@@ -70,4 +70,4 @@ class SalaryRepository:
     @staticmethod
     def get():
         """Optimize queryset by selecting related objects."""
-        return Salary.objects.all()
+        return Salary.objects.all().select_related("doctor")
