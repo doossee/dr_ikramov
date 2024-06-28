@@ -4,15 +4,13 @@ from .models import Doctor, Patient, Service
 
 
 class DoctorFilter(filters.FilterSet):
-    search = filters.CharFilter(method="search_by_name")
+    search = filters.CharFilter(method="filter_by_name")
     
     class Meta:
         model = Doctor
-        fields = [
-            "search",
-        ]
+        fields = []
 
-    def search_by_name(self, queryset, name, value):
+    def filter_by_name(self, queryset, name, value):
         return queryset.filter(
             Q(first_name__icontains=value)
             | Q(last_name__icontains=value)
@@ -21,15 +19,13 @@ class DoctorFilter(filters.FilterSet):
 
 
 class PatientFilter(filters.FilterSet):
-    search = filters.CharFilter(method="search_by_name")
+    search = filters.CharFilter(method="filter_by_name")
     
     class Meta:
         model = Patient
-        fields = [
-            "search",
-        ]
+        fields = []
 
-    def search_by_name(self, queryset, name, value):
+    def filter_by_name(self, queryset, name, value):
         return queryset.filter(
             Q(first_name__icontains=value)
             | Q(last_name__icontains=value)
@@ -38,15 +34,13 @@ class PatientFilter(filters.FilterSet):
 
 
 class ServiceFilter(filters.FilterSet):
-    search = filters.CharFilter(method="search_by_name")
+    search = filters.CharFilter(method="filter_by_name")
     
     class Meta:
         model = Service
-        fields = [
-            "search",
-        ]
+        fields = []
 
-    def search_by_name(self, queryset, name, value):
+    def filter_by_name(self, queryset, name, value):
         return queryset.filter(
             Q(name_en__icontains=value)
             | Q(name_ru__icontains=value)

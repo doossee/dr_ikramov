@@ -1,4 +1,3 @@
-# views.py
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 
@@ -35,7 +34,8 @@ from .serializers import (
     InitialRecordSerializer,
     RatingSerializer,
 )
-from .filters import DoctorFilter, PatientFilter
+from .filters import DoctorFilter, PatientFilter, ServiceFilter
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """User model viewset"""
@@ -256,11 +256,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = ServiceRepository.get()
     serializer_class = ServiceSerializer
     lookup_field = "slug"
-    search_fields = [
-        "name_en",
-        "name_ru",
-        "name_uz",
-    ]
+    filter_backends = ServiceFilter
 
 
 class InitialRecordViewSet(viewsets.ModelViewSet):
