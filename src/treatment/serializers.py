@@ -134,6 +134,16 @@ class ProfitWriteSerializer(serializers.ModelSerializer):
         exclude = ["report"]
 
 
+class ProfitAddSerializer(serializers.ModelSerializer):
+    """Profit add model serializer"""
+
+    date = serializers.DateField()
+
+    class Meta:
+        model = Profit
+        exclude = ["report", "appointment"]
+
+
 class ConsumptionWriteSerializer(serializers.ModelSerializer):
     """Consumption model serializer"""
 

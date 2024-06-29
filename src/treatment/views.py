@@ -10,7 +10,9 @@ from .serializers import (
     AppointmentSerializer,
     AppointmentReadSerializer,
     ReportSerializer,
+    ProfitReadSerializer,
     ProfitWriteSerializer,
+    ProfitAddSerializer,
     ConsumptionWriteSerializer,
     SalarySerializer,
     SalaryReadSerializer,
@@ -29,6 +31,24 @@ class AppointmentViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
         "retrieve": AppointmentReadSerializer,
     }
     filterset_class = AppointmentFilter
+    
+    @action(detail=True, methods=["post"], serializer_class=ProfitAddSerializer)
+    def add_profit(self, request, pk=None):
+        """Add profit report action"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        appointment = self.get_object()
+        date = serializer.validated_data["date"]
+        amount = serializer.validated_data["amount"]
+
+        try:
+            report, created = Report.objects.update_or_create(date=date)
+            profit = Profit.objects.create(report=report, appointment=appointment, amount=amount)
+            appointment.save()
+            return Response(ProfitReadSerializer(profit).data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
 
 class ReportViewSet(
