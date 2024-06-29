@@ -44,12 +44,21 @@ class ServiceSerializer(serializers.ModelSerializer):
         ]
 
 
+class ProfitReadSerializer(serializers.ModelSerializer):
+    """Profit model serializer"""
+
+    class Meta:
+        model = Profit
+        fields = "__all__"
+
+
 class AppointmentReadSerializer(serializers.ModelSerializer):
     """Appointment model serializer"""
 
     doctor = DoctorSerializer(read_only=True)
     patient = PatientSerializer(read_only=True)
     service = ServiceSerializer(read_only=True)
+    profits = ProfitReadSerializer(many=True, read_only=True)
 
     class Meta:
         model = Appointment

@@ -70,7 +70,6 @@ class ReportViewSet(
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-
     @action(detail=False, methods=["post"], serializer_class=ProfitWriteSerializer)
     def add_profit(self, request):
         """Add profit report action"""
@@ -128,4 +127,3 @@ class SalaryViewSet(
         "list": SalaryReadSerializer,
         "retrieve": SalaryReadSerializer,
     }
-    
