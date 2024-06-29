@@ -133,7 +133,7 @@ class Doctor(User):
     )
 
     balance = models.DecimalField(
-        verbose_name=_("Balance"), max_digits=11, decimal_places=2
+        verbose_name=_("Balance"), max_digits=11, decimal_places=2, default=0
     )
 
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
