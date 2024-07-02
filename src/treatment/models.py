@@ -149,7 +149,7 @@ class Salary(models.Model):
         verbose_name=_("Amount"), max_digits=11, decimal_places=2
     )
     comment = models.TextField(verbose_name=_("Comment"), blank=True)
-    
+
     created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
 

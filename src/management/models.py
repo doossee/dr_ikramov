@@ -133,7 +133,7 @@ class Doctor(User):
     )
 
     balance = models.DecimalField(
-        verbose_name=_("Balance"), max_digits=11, decimal_places=2
+        verbose_name=_("Balance"), max_digits=11, decimal_places=2, default=0
     )
 
     is_published = models.BooleanField(verbose_name=_("Publish"), default=True)
@@ -263,7 +263,7 @@ class InitialRecord(models.Model):
     first_name = models.CharField(verbose_name=_("First Name"), max_length=150)
     last_name = models.CharField(verbose_name=_("Last Name"), max_length=150)
     phone = models.CharField(verbose_name=_("Phone Number"), max_length=15)
-    
+
     is_active = models.BooleanField(_("Is active"), default=True)
     comment = models.TextField(verbose_name=_("Comment"), blank=True)
 

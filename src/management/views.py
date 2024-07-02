@@ -14,7 +14,7 @@ from .repositories import (
     SpecialtyRepository,
     ServiceRepository,
     InitialRecordRepository,
-    RatingRepository
+    RatingRepository,
 )
 from .serializers import (
     UserSerializer,
@@ -25,10 +25,10 @@ from .serializers import (
     AdminSerializer,
     MeAdminSerializer,
     DoctorSerializer,
-    MeDoctorSerializer, 
+    MeDoctorSerializer,
     DoctorGetSerializer,
     PatientSerializer,
-    MePatientSerializer, 
+    MePatientSerializer,
     SpecialtySerializer,
     ServiceSerializer,
     InitialRecordSerializer,

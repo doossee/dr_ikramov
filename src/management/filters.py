@@ -4,8 +4,11 @@ from .models import Doctor, Patient, Service
 
 
 class DoctorFilter(filters.FilterSet):
-    search = filters.CharFilter(method="filter_by_names", label="Search by first_name, last_name and middle_name")
-    
+    search = filters.CharFilter(
+        method="filter_by_names",
+        label="Search by first_name, last_name and middle_name",
+    )
+
     class Meta:
         model = Doctor
         fields = []
@@ -19,8 +22,11 @@ class DoctorFilter(filters.FilterSet):
 
 
 class PatientFilter(filters.FilterSet):
-    search = filters.CharFilter(method="filter_by_names", label="Search by first_name, last_name and middle_name")
-    
+    search = filters.CharFilter(
+        method="filter_by_names",
+        label="Search by first_name, last_name and middle_name",
+    )
+
     class Meta:
         model = Patient
         fields = []
@@ -34,8 +40,10 @@ class PatientFilter(filters.FilterSet):
 
 
 class ServiceFilter(filters.FilterSet):
-    search = filters.CharFilter(method="filter_by_names", label="Search by name_en, name_ru, name_uz")
-    
+    search = filters.CharFilter(
+        method="filter_by_names", label="Search by name_en, name_ru, name_uz"
+    )
+
     class Meta:
         model = Service
         fields = []
