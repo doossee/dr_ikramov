@@ -18,6 +18,10 @@ class DoctorRepository:
     @staticmethod
     def get():
         return Doctor.objects.all().prefetch_related("specialties")
+    
+    @staticmethod
+    def get_published():
+        return Doctor.objects.filter(is_published=True).prefetch_related("specialties")
 
 class PatientRepository:
     @staticmethod

@@ -15,7 +15,7 @@ from .serializers import (
     SalarySerializer,
     SalaryReadSerializer,
 )
-from .filters import AppointmentFilter, ReportFilter
+from .filters import AppointmentFilter, ReportFilter, SalaryFilter
 from .repository import AppointmentRepository, ReportRepository, SalaryRepository
 
 
@@ -128,4 +128,4 @@ class SalaryViewSet(
         "list": SalaryReadSerializer,
         "retrieve": SalaryReadSerializer,
     }
-    
+    filterset_class = SalaryFilter

@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -226,13 +226,31 @@ class AdminViewSet(viewsets.ModelViewSet):
 class DoctorViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
     """Doctor model viewset"""
 
-    queryset = DoctorRepository.get()
     serializer_class = DoctorSerializer
     serializer_action_classes = {
         "list": DoctorGetSerializer,
         "retrieve": DoctorGetSerializer,
     }
     filterset_class = DoctorFilter
+
+    def get_queryset(self):
+        """Return queryset based on user's authentication status."""
+        if self.request.user.is_authenticated:
+            return DoctorRepository.get()
+        else:
+            return DoctorRepository.get_published()
+
+    def get_permissions(self):
+        """Set permissions based on user's authentication status."""
+        if self.request.user.is_authenticated:
+            # Authenticated users can perform any action
+            return [permissions.IsAuthenticated()]
+        else:
+            # Unauthenticated users can only read data (list and retrieve)
+            if self.action in ['list', 'retrieve']:
+                return [permissions.AllowAny()]
+            else:
+                return [permissions.IsAuthenticated()]
 
 
 class PatientViewSet(viewsets.ModelViewSet):

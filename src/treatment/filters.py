@@ -31,3 +31,20 @@ class ReportFilter(filters.FilterSet):
         fields = [
             "date",
         ]
+
+
+class SalaryFilter(filters.FilterSet):
+    search = filters.CharFilter(method="filter_search", label="Search by doctor's first_name, last_name, middle_name and date")
+    
+    class Meta:
+        model = Appointment
+        fields = []
+
+    def filter_patient_by_names(self, queryset, name, value):
+        return queryset.filter(
+            Q(doctor__first_name__icontains=value)
+            | Q(doctor__last_name__icontains=value)
+            | Q(doctor__middle_name__icontains=value)
+            | Q(created_at__icontains=value)
+        )
+
