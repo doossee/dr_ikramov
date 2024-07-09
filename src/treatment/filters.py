@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django_filters import rest_framework as filters
-from .models import Appointment, Report
+from .models import Appointment, Report, Salary
 
 
 class AppointmentFilter(filters.FilterSet):
@@ -42,7 +42,7 @@ class SalaryFilter(filters.FilterSet):
     search = filters.CharFilter(method="filter_search", label="Search by doctor's first_name, last_name, middle_name and date")
     
     class Meta:
-        model = Appointment
+        model = Salary
         fields = []
 
     def filter_patient_by_names(self, queryset, name, value):
