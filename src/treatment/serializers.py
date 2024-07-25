@@ -170,3 +170,13 @@ class SalaryReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Salary
         fields = "__all__"
+
+
+class SalaryWriteSerializer(serializers.ModelSerializer):
+    """Salary write model serializer"""
+
+    date = serializers.DateField()
+
+    class Meta:
+        model = Salary
+        exclude = ["report"]
