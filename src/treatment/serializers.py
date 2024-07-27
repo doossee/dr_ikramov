@@ -157,6 +157,8 @@ class ConsumptionWriteSerializer(serializers.ModelSerializer):
 class SalarySerializer(serializers.ModelSerializer):
     """Salary model serializer"""
 
+    doctor = DoctorSerializer(read_only=True)
+
     class Meta:
         model = Salary
         fields = "__all__"
