@@ -1,4 +1,4 @@
-from django.db.models import Sum, F, DecimalField, ExpressionWrapper
+from django.db.models import Sum, DecimalField, ExpressionWrapper
 from django.db.models.functions import Coalesce
 from django.db.models import Prefetch
 from .models import Appointment, Report, Profit, Consumption, Salary
@@ -15,16 +15,23 @@ class ReportRepository:
     @staticmethod
     def get():
         """Annotate total profit, total consumption, and net profit for reports."""
-        return (
+        reports = (
             Report.objects.all()
             .prefetch_related(
                 Prefetch(
                     "profits",
-                    queryset=Profit.objects.all().select_related("appointment"),
+                    queryset=Profit.objects.all().select_related(
+                        "appointment",
+                        "appointment__patient__user_ptr",
+                        "appointment__doctor__user_ptr",
+                        "appointment__service",
+                    ),
                 ),
                 Prefetch(
                     "consumptions",
-                    queryset=Consumption.objects.all().select_related('salary__doctor'),
+                    queryset=Consumption.objects.all().select_related(
+                        "salary", "salary__doctor__user_ptr"
+                    ),
                 ),
             )
             .annotate(
@@ -35,17 +42,38 @@ class ReportRepository:
                     Sum("consumptions__amount"), 0, output_field=DecimalField()
                 ),
                 net_profit=ExpressionWrapper(
-                    F("total_profit") - F("total_consumption"),
+                    Coalesce(Sum("profits__amount"), 0, output_field=DecimalField())
+                    - Coalesce(
+                        Sum("consumptions__amount"), 0, output_field=DecimalField()
+                    ),
                     output_field=DecimalField(max_digits=11, decimal_places=2),
                 ),
             )
         )
+        return reports
 
     @staticmethod
     def get_annotated_report(report_id):
         """Helper method to get annotated report by id"""
-        return (
+        report = (
             Report.objects.filter(id=report_id)
+            .prefetch_related(
+                Prefetch(
+                    "profits",
+                    queryset=Profit.objects.all().select_related(
+                        "appointment",
+                        "appointment__patient__user_ptr",
+                        "appointment__doctor__user_ptr",
+                        "appointment__service",
+                    ),
+                ),
+                Prefetch(
+                    "consumptions",
+                    queryset=Consumption.objects.all().select_related(
+                        "salary", "salary__doctor__user_ptr"
+                    ),
+                ),
+            )
             .annotate(
                 total_profit=Coalesce(
                     Sum("profits__amount"), 0, output_field=DecimalField()
@@ -54,22 +82,16 @@ class ReportRepository:
                     Sum("consumptions__amount"), 0, output_field=DecimalField()
                 ),
                 net_profit=ExpressionWrapper(
-                    F("total_profit") - F("total_consumption"),
+                    Coalesce(Sum("profits__amount"), 0, output_field=DecimalField())
+                    - Coalesce(
+                        Sum("consumptions__amount"), 0, output_field=DecimalField()
+                    ),
                     output_field=DecimalField(max_digits=11, decimal_places=2),
-                ),
-            )
-            .prefetch_related(
-                Prefetch(
-                    "profits",
-                    queryset=Profit.objects.all().select_related("appointment"),
-                ),
-                Prefetch(
-                    "consumptions",
-                    queryset=Consumption.objects.all().select_related('salary__doctor'),
                 ),
             )
             .first()
         )
+        return report
 
     @staticmethod
     def get_reports_in_range(start_date, end_date):
@@ -80,11 +102,18 @@ class ReportRepository:
             .prefetch_related(
                 Prefetch(
                     "profits",
-                    queryset=Profit.objects.all().select_related("appointment"),
+                    queryset=Profit.objects.all().select_related(
+                        "appointment",
+                        "appointment__patient__user_ptr",
+                        "appointment__doctor__user_ptr",
+                        "appointment__service",
+                    ),
                 ),
                 Prefetch(
                     "consumptions",
-                    queryset=Consumption.objects.all().select_related('salary__doctor'),
+                    queryset=Consumption.objects.all().select_related(
+                        "salary", "salary__doctor__user_ptr"
+                    ),
                 ),
             )
             .annotate(
@@ -95,7 +124,10 @@ class ReportRepository:
                     Sum("consumptions__amount"), 0, output_field=DecimalField()
                 ),
                 net_profit=ExpressionWrapper(
-                    F("total_profit") - F("total_consumption"),
+                    Coalesce(Sum("profits__amount"), 0, output_field=DecimalField())
+                    - Coalesce(
+                        Sum("consumptions__amount"), 0, output_field=DecimalField()
+                    ),
                     output_field=DecimalField(max_digits=11, decimal_places=2),
                 ),
             )
@@ -107,12 +139,12 @@ class ReportRepository:
         net_profit = total_profit - total_consumption
 
         return {
-            'aggregated_totals': {
-                'total_profit': total_profit,
-                'total_consumption': total_consumption,
-                'net_profit': net_profit
+            "aggregated_totals": {
+                "total_profit": total_profit,
+                "total_consumption": total_consumption,
+                "net_profit": net_profit,
             },
-            'reports': reports
+            "reports": reports,
         }
 
 

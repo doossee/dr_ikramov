@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 
 from src.base import MultiSerializerMixin
-from src.treatment.models import Report, Profit, Consumption, Salary 
+from src.treatment.models import Report, Profit, Consumption, Salary
 from .serializers import (
     AppointmentSerializer,
     AppointmentReadSerializer,
@@ -16,8 +16,7 @@ from .serializers import (
     ProfitAddSerializer,
     ConsumptionWriteSerializer,
     SalarySerializer,
-    SalaryReadSerializer,
-    SalaryWriteSerializer
+    SalaryWriteSerializer,
 )
 from .filters import AppointmentFilter, ReportFilter, SalaryFilter
 from .repository import AppointmentRepository, ReportRepository, SalaryRepository
@@ -33,7 +32,7 @@ class AppointmentViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
         "retrieve": AppointmentReadSerializer,
     }
     filterset_class = AppointmentFilter
-    
+
     @action(detail=True, methods=["post"], serializer_class=ProfitAddSerializer)
     def add_profit(self, request, pk=None):
         """Add profit report action"""
@@ -46,7 +45,9 @@ class AppointmentViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
 
         try:
             report, created = Report.objects.update_or_create(date=date)
-            profit = Profit.objects.create(report=report, appointment=appointment, amount=amount)
+            profit = Profit.objects.create(
+                report=report, appointment=appointment, amount=amount
+            )
             appointment.save()
             return Response(ProfitReadSerializer(profit).data)
         except Exception as e:
@@ -92,42 +93,54 @@ class ReportViewSet(
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get"], url_path='range')
+    @action(detail=False, methods=["get"], url_path="range")
     def get_reports_in_range(self, request):
         """Retrieve aggregated totals and a list of reports within a specified date range."""
-        start_date_str = request.query_params.get('start_date')
-        end_date_str = request.query_params.get('end_date')
+        start_date_str = request.query_params.get("start_date")
+        end_date_str = request.query_params.get("end_date")
 
         # Validate and parse dates
         if not start_date_str or not end_date_str:
-            return Response({"error": "Both 'start_date' and 'end_date' query parameters are required."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {
+                    "error": "Both 'start_date' and 'end_date' query parameters are required."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
             start_date = parse_date(start_date_str)
             end_date = parse_date(end_date_str)
         except ValueError:
-            return Response({"error": "Invalid date format. Use YYYY-MM-DD."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {"error": "Invalid date format. Use YYYY-MM-DD."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if not start_date or not end_date:
-            return Response({"error": "Both 'start_date' and 'end_date' must be valid dates."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Both 'start_date' and 'end_date' must be valid dates."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if start_date > end_date:
-            return Response({"error": "'start_date' must be before 'end_date'."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "'start_date' must be before 'end_date'."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Get aggregated totals and list of reports
         data = ReportRepository.get_reports_in_range(start_date, end_date)
-        
+
         # Serialize the list of reports
-        report_serializer = ReportSerializer(data['reports'], many=True)
-        
-        return Response({
-            'aggregated_totals': data['aggregated_totals'],
-            'reports': report_serializer.data
-        })
+        report_serializer = ReportSerializer(data["reports"], many=True)
+
+        return Response(
+            {
+                "aggregated_totals": data["aggregated_totals"],
+                "reports": report_serializer.data,
+            }
+        )
 
     @action(detail=False, methods=["post"], serializer_class=ProfitWriteSerializer)
     def add_profit(self, request):
@@ -146,7 +159,9 @@ class ReportViewSet(
             report = ReportRepository.get_annotated_report(report.id)
             return Response(ReportSerializer(report).data)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=False, methods=["post"], serializer_class=ConsumptionWriteSerializer)
     def add_consumption(self, request):
@@ -168,8 +183,10 @@ class ReportViewSet(
             report = ReportRepository.get_annotated_report(report.id)
             return Response(ReportSerializer(report).data)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     @action(detail=False, methods=["post"], serializer_class=SalaryWriteSerializer)
     def add_salary(self, request):
         """Add consumption report action"""
@@ -185,13 +202,19 @@ class ReportViewSet(
         try:
             report, _ = Report.objects.update_or_create(date=date)
             Salary.objects.create(
-                report=report, title=title, description=description, amount=amount, doctor=doctor
+                report=report,
+                title=title,
+                description=description,
+                amount=amount,
+                doctor=doctor,
             )
 
             report = ReportRepository.get_annotated_report(report.id)
             return Response(ReportSerializer(report).data)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class SalaryViewSet(
@@ -206,8 +229,6 @@ class SalaryViewSet(
     queryset = SalaryRepository.get()
     serializer_class = SalarySerializer
     serializer_action_classes = {
-        "list": SalaryReadSerializer,
-        "retrieve": SalaryReadSerializer,
         "create": SalaryWriteSerializer,
     }
     filterset_class = SalaryFilter
@@ -229,10 +250,17 @@ class SalaryViewSet(
         try:
             report, _ = Report.objects.update_or_create(date=date)
             Salary.objects.create(
-                report=report, title=title, description=description, amount=amount, doctor=doctor
+                report=report,
+                title=title,
+                description=description,
+                amount=amount,
+                doctor=doctor,
             )
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
 
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

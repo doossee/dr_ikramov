@@ -8,7 +8,7 @@ from .views import (
     SpecialtyViewSet,
     ServiceViewSet,
     InitialRecordViewSet,
-    RatingViewSet
+    RatingViewSet,
 )
 
 router = DefaultRouter()

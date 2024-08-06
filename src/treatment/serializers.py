@@ -4,13 +4,7 @@ from src.management.models import Doctor, Patient, Service
 from .models import Appointment, Report, Profit, Consumption, Salary
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
-    """Appointment model serializer"""
-
-    class Meta:
-        model = Appointment
-        fields = "__all__"
-
+# <-----Base Serializers----> #
 
 class DoctorSerializer(serializers.ModelSerializer):
     """Doctor model serializer"""
@@ -52,6 +46,16 @@ class ProfitReadSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+# <-----Appointment Serializers----> #
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    """Appointment model serializer"""
+
+    class Meta:
+        model = Appointment
+        fields = "__all__"
+
+
 class AppointmentReadSerializer(serializers.ModelSerializer):
     """Appointment model serializer"""
 
@@ -65,34 +69,104 @@ class AppointmentReadSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AppointmentNestedSerializer(serializers.ModelSerializer):
+    """Appointment model serializer"""
+
+    doctor = DoctorSerializer(read_only=True)
+    patient = PatientSerializer(read_only=True)
+    service = ServiceSerializer(read_only=True)
+
+    class Meta:
+        model = Appointment
+        fields = "__all__"
+
+
+# <-----Profit Serializers----> #
+
 class ProfitSerializer(serializers.ModelSerializer):
     """Profit model serializer"""
 
-    appointment = AppointmentReadSerializer(read_only=True)
+    appointment = AppointmentNestedSerializer(read_only=True)
 
     class Meta:
         model = Profit
         fields = "__all__"
 
 
+class ProfitWriteSerializer(serializers.ModelSerializer):
+    """Profit model serializer"""
+
+    date = serializers.DateField()
+
+    class Meta:
+        model = Profit
+        exclude = ["report"]
+
+
+class ProfitAddSerializer(serializers.ModelSerializer):
+    """Profit add model serializer"""
+
+    date = serializers.DateField()
+
+    class Meta:
+        model = Profit
+        exclude = ["report", "appointment"]
+
+
+# <-----Consumption Serializers----> #
+
 class ConsumptionSerializer(serializers.ModelSerializer):
     """Consumption model serializer"""
 
+    doctor = DoctorSerializer(source="salary.doctor", read_only=True)
+
     class Meta:
         model = Consumption
+        fields = (
+            "id",
+            "title",
+            "description",
+            "amount",
+            "created_at",
+            "updated_at",
+            "report",
+            "doctor",
+        )
+
+
+class ConsumptionWriteSerializer(serializers.ModelSerializer):
+    """Consumption model serializer"""
+
+    date = serializers.DateField()
+
+    class Meta:
+        model = Consumption
+        exclude = ["report"]
+
+
+# <-----Salary Serializers----> #
+
+class SalarySerializer(serializers.ModelSerializer):
+    """Appointment model serializer"""
+
+    doctor = DoctorSerializer(read_only=True)
+
+    class Meta:
+        model = Salary
         fields = "__all__"
 
 
-# class ReportSerializer(serializers.ModelSerializer):
-#     """Report model serializer"""
+class SalaryWriteSerializer(serializers.ModelSerializer):
+    """Salary write model serializer"""
 
-#     profits = ProfitSerializer(many=True, read_only=True)
-#     consumptions = ConsumptionSerializer(many=True, read_only=True)
+    date = serializers.DateField()
 
-#     class Meta:
-#         model = Report
-#         fields = "__all__"
+    class Meta:
+        model = Salary
+        exclude = ["report"]
 
+
+# <-----Report Serializers----> #
 
 class ReportSerializer(serializers.ModelSerializer):
     """Report model serializer"""
@@ -124,61 +198,7 @@ class ReportSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProfitWriteSerializer(serializers.ModelSerializer):
-    """Profit model serializer"""
-
-    date = serializers.DateField()
-
-    class Meta:
-        model = Profit
-        exclude = ["report"]
 
 
-class ProfitAddSerializer(serializers.ModelSerializer):
-    """Profit add model serializer"""
-
-    date = serializers.DateField()
-
-    class Meta:
-        model = Profit
-        exclude = ["report", "appointment"]
 
 
-class ConsumptionWriteSerializer(serializers.ModelSerializer):
-    """Consumption model serializer"""
-
-    date = serializers.DateField()
-
-    class Meta:
-        model = Consumption
-        exclude = ["report"]
-
-
-class SalarySerializer(serializers.ModelSerializer):
-    """Salary model serializer"""
-
-    doctor = DoctorSerializer(read_only=True)
-
-    class Meta:
-        model = Salary
-        fields = "__all__"
-
-
-class SalaryReadSerializer(serializers.ModelSerializer):
-    """Appointment model serializer"""
-
-    doctor = DoctorSerializer(read_only=True)
-
-    class Meta:
-        model = Salary
-        fields = "__all__"
-
-
-class SalaryWriteSerializer(serializers.ModelSerializer):
-    """Salary write model serializer"""
-
-    date = serializers.DateField()
-
-    class Meta:
-        model = Salary
-        exclude = ["report"]

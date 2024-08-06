@@ -39,8 +39,11 @@ class ReportFilter(filters.FilterSet):
 
 
 class SalaryFilter(filters.FilterSet):
-    search = filters.CharFilter(method="filter_search", label="Search by doctor's first_name, last_name, middle_name and date")
-    
+    search = filters.CharFilter(
+        method="filter_search",
+        label="Search by doctor's first_name, last_name, middle_name and date",
+    )
+
     class Meta:
         model = Salary
         fields = []
@@ -52,4 +55,3 @@ class SalaryFilter(filters.FilterSet):
             | Q(doctor__middle_name__icontains=value)
             | Q(created_at__icontains=value)
         )
-

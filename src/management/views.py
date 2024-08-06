@@ -247,7 +247,7 @@ class DoctorViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
             return [permissions.IsAuthenticated()]
         else:
             # Unauthenticated users can only read data (list and retrieve)
-            if self.action in ['list', 'retrieve']:
+            if self.action in ["list", "retrieve"]:
                 return [permissions.AllowAny()]
             else:
                 return [permissions.IsAuthenticated()]
