@@ -92,6 +92,15 @@ class ReportViewSet(
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        except self.get_queryset().model.DoesNotExist:
+            # Return an empty response if the object is not found
+            return Response({}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"], url_path="range")
     def get_reports_in_range(self, request):

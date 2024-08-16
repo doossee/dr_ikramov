@@ -1,6 +1,3 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import gettext_lazy as _
-
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -120,93 +117,6 @@ class UserViewSet(viewsets.ModelViewSet):
             instance.change_password(**data)
             return Response(status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(url_path="reset-password", detail=False, methods=["POST"])
-    def reset_password(self, request):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            if serializer.is_valid():
-                instance = UserRepository.get_by_phone(
-                    phone=serializer.validated_data.get("phone")
-                )
-                if instance.reset_password():
-                    return Response(
-                        {
-                            "success": _(
-                                "The password has been reset and sent to your phone number!"
-                            )
-                        },
-                        status=status.HTTP_200_OK,
-                    )
-                return Response(
-                    {"message": _("Error sending the message!")},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-
-        except User.DoesNotExist:
-            return Response(
-                {"message": _("The user with this phone has not been found!")},
-                status.HTTP_404_NOT_FOUND,
-            )
-
-    @action(url_path="signup", detail=False, methods=["POST"])
-    def signup(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            data = serializer.validated_data
-            UserRepository.signup(**data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(url_path="regenerate-verify-code", detail=False, methods=["POST"])
-    def regenerate_verify_code(self, request):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            if serializer.is_valid():
-                instance = UserRepository.get_by_phone(
-                    phone=serializer.validated_data.get("phone")
-                )
-                if instance.regenerate_verify_code():
-                    return Response(
-                        {"success": _("The verification code sent!")},
-                        status=status.HTTP_200_OK,
-                    )
-                return Response(
-                    {"message": _("Error sending the message!")},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-
-        except User.DoesNotExist:
-            return Response(
-                {"message": _("The user with this phone has not been found!")},
-                status.HTTP_404_NOT_FOUND,
-            )
-
-    @action(url_path="verify", detail=False, methods=["POST"])
-    def verify(self, request):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            if serializer.is_valid():
-                data = serializer.validated_data
-                instance = UserRepository.get_by_phone(data.get("phone"))
-                if instance.verify(data.get("code")):
-                    return Response(
-                        {"success": _("The user is verified!")},
-                        status=status.HTTP_200_OK,
-                    )
-                return Response(
-                    {"message": _("Verify error timeout or invalid code!")},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-
-        except ObjectDoesNotExist:
-            return Response(
-                {"message": _("The user with this phone has not been found!")},
-                status.HTTP_404_NOT_FOUND,
-            )
 
 
 class AdminViewSet(viewsets.ModelViewSet):
