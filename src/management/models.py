@@ -2,8 +2,8 @@ from datetime import date
 
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
@@ -13,13 +13,6 @@ from imagekit import models as ik_models, processors as ik_processors
 
 from .choices import UserTypeChoices, CategoryChoices, RateChoices
 from .managers import UserManager
-from .utils import (
-    change_password,
-    reset_password,
-    change_avatar,
-    generate_verify_code,
-    verify_user,
-)
 
 
 class User(AbstractUser):
@@ -35,13 +28,6 @@ class User(AbstractUser):
     )
     birth_date = models.DateField(
         verbose_name=_("Birth date"), default=date(2000, 1, 1), blank=True
-    )
-
-    verify_code = models.PositiveSmallIntegerField(
-        verbose_name=_("Verify Code"), default=0
-    )
-    verify_time = models.DateTimeField(
-        verbose_name=_("Verify Time"), default=timezone.now
     )
 
     created_at = models.DateTimeField(verbose_name=_("Created Time"), auto_now_add=True)
@@ -68,6 +54,10 @@ class User(AbstractUser):
         return f"{self.first_name} {self.last_name}"
 
     def save(self, *args, **kwargs):
+        if not self.password:
+            password = f"dr-{self.last_name}"
+            self.set_password(password)
+
         self.user_type = self.get_user_type()
         self.username = self.phone
         super().save(*args, **kwargs)
@@ -82,20 +72,19 @@ class User(AbstractUser):
         else:
             return self.user_type
 
-    def change_password(self, password, new_password, confirm_password):
-        change_password(self, password, new_password, confirm_password)
+    def change_password(user, password, new_password, confirm_password):
+        if not user.check_password(password):
+            raise ValidationError(_("Password is incorrect!"))
 
-    def reset_password(self):
-        reset_password(self)
+        if new_password != confirm_password:
+            raise ValidationError(_("New password and confirmation password are equal!"))
 
-    def change_avatar(self, avatar):
-        change_avatar(self, avatar)
+        user.set_password(confirm_password)
+        user.save()
 
-    def generate_verify_code(self):
-        generate_verify_code(self)
-
-    def verify(self, code):
-        return verify_user(self, code)
+    def change_avatar(user, avatar):
+        user.avatar = avatar
+        user.save()
 
 
 class Admin(User, SingletonModel):
