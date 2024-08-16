@@ -1,5 +1,6 @@
 from dateutil import parser as date_parser
 from django.utils.dateparse import parse_date
+from django.http import Http404
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -98,7 +99,7 @@ class ReportViewSet(
             instance = self.get_object()
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
-        except self.get_queryset().model.DoesNotExist:
+        except Http404:
             # Return an empty response if the object is not found
             return Response({}, status=status.HTTP_200_OK)
 
