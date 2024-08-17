@@ -18,8 +18,6 @@ class ProfileMeta:
         "is_active",
         "is_staff",
         "is_superuser",
-        "verify_time",
-        "verify_code",
     ]
     read_only_fields = [
         "username",
