@@ -46,7 +46,7 @@ class SalaryFilter(filters.FilterSet):
 
     class Meta:
         model = Salary
-        fields = []
+        fields = ["doctor",]
 
     def filter_patient_by_names(self, queryset, name, value):
         return queryset.filter(

@@ -34,6 +34,14 @@ class AppointmentViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
     }
     filterset_class = AppointmentFilter
 
+    def get_queryset(self):
+        if self.request.user.user_type == "DOCTOR":
+            qs = super().get_queryset().filter(doctor=self.request.user)
+        else:
+            qs = super().get_queryset()
+
+        return qs
+
     @action(detail=True, methods=["post"], serializer_class=ProfitAddSerializer)
     def add_profit(self, request, pk=None):
         """Add profit report action"""
@@ -64,6 +72,7 @@ class ReportViewSet(
     serializer_class = ReportSerializer
     filterset_class = ReportFilter
     lookup_field = "date"
+
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -242,6 +251,14 @@ class SalaryViewSet(
         "create": SalaryWriteSerializer,
     }
     filterset_class = SalaryFilter
+
+    def get_queryset(self):
+        if self.request.user.user_type == "DOCTOR":
+            qs = super().get_queryset().filter(doctor=self.request.user)
+        else:
+            qs = super().get_queryset()
+
+        return qs
 
     def create(self, request, *args, **kwargs):
         """Create a new salary instance"""
