@@ -105,7 +105,11 @@ class UserViewSet(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             data = serializer.validated_data
             instance.change_avatar(**data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+            # Build the full URL for the avatar
+            avatar_url = request.build_absolute_uri(instance.avatar.url)
+            
+            return Response({"avatar": avatar_url}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(url_path="change-password", detail=False, methods=["POST"])
