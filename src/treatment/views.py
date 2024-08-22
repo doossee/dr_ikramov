@@ -1,7 +1,7 @@
 from dateutil import parser as date_parser
 from django.utils.dateparse import parse_date
 from django.http import Http404
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -33,6 +33,7 @@ class AppointmentViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
         "retrieve": AppointmentReadSerializer,
     }
     filterset_class = AppointmentFilter
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.user_type == "DOCTOR":
@@ -72,6 +73,7 @@ class ReportViewSet(
     serializer_class = ReportSerializer
     filterset_class = ReportFilter
     lookup_field = "date"
+    permission_classes = [permissions.IsAuthenticated]
 
 
     def list(self, request, *args, **kwargs):
@@ -251,6 +253,7 @@ class SalaryViewSet(
         "create": SalaryWriteSerializer,
     }
     filterset_class = SalaryFilter
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.user_type == "DOCTOR":

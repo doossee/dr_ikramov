@@ -39,6 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = UserRepository.get()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
         action = self.action
@@ -146,6 +147,7 @@ class DoctorViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
         "retrieve": DoctorGetSerializer,
     }
     filterset_class = DoctorFilter
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         """Return queryset based on user's authentication status."""
@@ -173,6 +175,7 @@ class PatientViewSet(viewsets.ModelViewSet):
     queryset = PatientRepository.get()
     serializer_class = PatientSerializer
     filterset_class = PatientFilter
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class SpecialtyViewSet(viewsets.ModelViewSet):
@@ -180,6 +183,7 @@ class SpecialtyViewSet(viewsets.ModelViewSet):
 
     queryset = SpecialtyRepository.get()
     serializer_class = SpecialtySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
@@ -189,6 +193,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     serializer_class = ServiceSerializer
     lookup_field = "slug"
     filterset_class = ServiceFilter
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class InitialRecordViewSet(viewsets.ModelViewSet):
