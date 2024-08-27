@@ -34,7 +34,7 @@ SECURE_PROXY_SSL_HEADER = (
 )
 SECURE_SSL_REDIRECT = getattr(settings, "SECURE_SSL_REDIRECT", False)
 SESSION_COOKIE_SECURE = getattr(settings, "SESSION_COOKIE_SECURE", False)
-CSRF_COOKIE_SECURE = getattr(settings, "CSRF_COOKIE_SECURE", False)
+# CSRF_COOKIE_SECURE = getattr(settings, "CSRF_COOKIE_SECURE", False)
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
