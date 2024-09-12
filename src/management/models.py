@@ -139,6 +139,8 @@ class Doctor(User):
 class Patient(User):
     """Patient user model"""
 
+    address = models.CharField(verbose_name=_("Address"), max_length=255, null=True, blank=True)
+
     class Meta:
         db_table = "patient"
         verbose_name = _("Patient")

@@ -26,7 +26,7 @@ SECRET_KEY = getattr(
 DEBUG = getattr(settings, "DEBUG", True)
 
 ALLOWED_HOSTS = getattr(settings, "ALLOWED_HOSTS", ["*"])
-CSRF_TRUSTED_ORIGINS = getattr(settings, "CSRF_TRUSTED_ORIGINS", ["*"])
+CSRF_TRUSTED_ORIGINS = getattr(settings, "CSRF_TRUSTED_ORIGINS", ["http://127.0.0.1"])
 
 # SECURITY CERTIFICATE
 SECURE_PROXY_SSL_HEADER = (
